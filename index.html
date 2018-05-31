@@ -386,7 +386,7 @@
 
             $("#bid-ok").attr("disabled", "disabled");
             try {
-                var serialNumber = nebPay.pay(toAddress,amount,"bid",JSON.stringify(args),{
+                var serialNumber = nebPay.call(toAddress,amount,"bid",JSON.stringify(args),{
                     qrcode: {
                         showQRCode: false
                     },
@@ -424,7 +424,7 @@
 
             $("#take-nas-ok").attr("disabled", "disabled");
             try {
-                var serialNumber = nebPay.pay(toAddress,amount,"takeNasByBidder",JSON.stringify(args),{
+                var serialNumber = nebPay.call(toAddress,amount,"takeNasByBidder",JSON.stringify(args),{
                     qrcode: {
                         showQRCode: false
                     },
