@@ -1,0 +1,59 @@
+a {
+  color: #00B7FF;
+}
+
+span.warning{
+  color:#eeaa00;
+}
+
+span.error{
+  color:#dd0000;
+}
+
+span.ok{
+  color:#00aa00;
+}
+
+.dinner{
+  margin:2em;
+  border-radius: 0.3em;
+  padding:1.5em 2em;
+  box-shadow: 0 0.3em 1em #000;
+}
+
+.cert-title{
+  text-align: center;
+  color: coral;
+}
+
+.cert-name{
+  text-align: left;
+}
+
+.cert-text{
+  text-align: left
+}
+
+.cert-issuer{
+  text-align: right;
+}
+
+.cert-date{
+  text-align: right;
+}
+
+#ex1Slider .slider-selection {
+	background: #17a2b8;
+}
+.tooltip.in {
+  opacity: 0.9;
+}
+
+.btn-mutil-line{
+  margin-top:0.8em;
+}
+.text-nowrap{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}

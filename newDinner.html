@@ -1,0 +1,175 @@
+<!doctype>
+<html>
+
+<head>
+    <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/ui-block.css" rel="stylesheet">
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <title>一起吃饭吧！</title>
+    <meta name=viewport content="width=device-width">
+    <meta charset="utf-8">
+</head>
+<body>
+    <div class=logo-main></div>
+    <div class="title" style="text-align: center;"></div>
+
+    <div class="container transfer">
+        <div class="form-group row">
+            <div class=col-md-6>
+                <label data-i18n=list/owner-address>Owner Address</label>
+                <div class="owner icon-address" name="owner"></div>
+            </div>
+            <div class=col-md-6>
+                <label for="title" data-i18n=new-dinner/title>Title</label>
+                <input id="title" class="form-control" data-i18n="placeholder/title">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class=col>
+                <label for=text>
+                    <span data-i18n=register/text>Text</span>
+                </label>
+                <div class="text">
+                    <textarea id="text" class="form-control" style="height: 120px;" data-i18n="placeholder/text"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class=col>
+                <div style="background-color:lightblue;border:1px dashed;border-radius: 4px;color: darkslategray;width: 100%;padding:8px;font-size: 12px;">
+                    <span data-i18n="issue/tips"> </span>
+                    <span id="current-block">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class=col-md-6>
+                <label for="begin-block" data-i18n=new-dinner/begin-block>Begin Block</label>
+                <input id="begin-block" class="form-control" data-i18n="placeholder/begin-block">
+            </div>
+            <div class=col-md-6>
+                <label for="end-block" data-i18n=new-dinner/end-block>End Block</label>
+                <input id="end-block" class="form-control" data-i18n="placeholder/end-block">
+            </div>
+            <div class=col-md-6>
+                <label for="min-bid-step" data-i18n=new-dinner/min-bid-step>Max Bid Step</label>
+                <input id="min-bid-step" class="form-control" data-i18n="placeholder/min-bid-step" value=0.1>
+            </div>
+            <div class=col-md-6>
+                <label for="max-bid-step" data-i18n=new-dinner/max-bid-step>Max Bid Step</label>
+                <input id="max-bid-step" class="form-control" data-i18n="placeholder/max-bid-step" value=3>
+            </div>
+            <div class=col-md-6>
+                <label for="share-percent" data-i18n=new-dinner/share-percent>Share Percent</label>
+                <input id="share-percent" class="form-control" data-i18n="placeholder/share-percent" value=20>
+            </div>
+        </div>
+        <div class="form-group row">        
+            <div class=col>
+                <button id=issue class="btn btn-block" data-i18n=new-dinner/issue>Issue</button>
+            </div>
+        </div>
+    </div>
+
+    <div id=result class="container" >
+    </div>
+    
+    <div class=footer></div>
+
+    <script src="libs/jquery-3.3.1.min.js"></script>
+    <script src="libs/bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js" data-depends="jquery.slim"></script>
+    <script src="libs/external/jquery.md5.js"></script>
+    <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
+    <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/blockies.min.js"></script>
+    <script src="dist/nebulas.js"></script>
+    <script src="libs/nebPay.js"></script>
+    <script src="js/1-localSave.js"></script>
+    <script src="js/home.v1.js"></script>
+    <script src="js/i18n.js" data-depends="jquery.slim"></script>
+    <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+    <script>
+            "use strict";
+    
+            var nebulas = require("nebulas"),
+                Transaction = nebulas.Transaction,
+                Utils = nebulas.Utils,
+                Unit = nebulas.Unit,
+                neb = new nebulas.Neb(),
+                validateAll = uiBlock.validate();
+
+            var queryNet = getQueryVariable("net");
+
+            uiBlock.insert({
+                footer: ".footer",
+                title: ".title",
+                header: ".header",
+                iconAddress: ".icon-address",
+                logoMain: [".logo-main", queryNet, queryNet==null],
+                numberComma: ".number-comma",
+            });
+
+            neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
+
+            neb.api.getNebState().then(function(state) {
+                $("#current-block").text(state.height);
+                $("#begin-block").val(state.height);
+                $("#end-block").val(parseInt(state.height)+100*60/15);
+            });
+
+            var NebPay = require("nebpay");
+            var nebPay = new NebPay();
+
+            $("#issue").on("click", onClickIssue);
+            $(".icon-address.owner input").val("n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8");
+            $("#title").val("title");
+            $("#text").val("text");
+            
+            function onClickIssue() {
+                var fromAddress, title, text, beginBlock, endBlock, minBidStep, maxBidStep, sharePercent, toAddress, amount, args;
+                if (validateAll()) {
+                    fromAddress = $(".icon-address.owner input").val();
+                    title = $("#title").val();
+                    text = $("#text").val();
+                    beginBlock = $("#begin-block").val();
+                    endBlock = $("#end-block").val();
+                    minBidStep = $("#min-bid-step").val();
+                    maxBidStep = $("#max-bid-step").val();
+                    sharePercent = $("#share-percent").val();
+                    toAddress = localSave.getItem("contract");;
+                    amount = "0";
+                    args=[fromAddress,title,text,beginBlock,endBlock,minBidStep,maxBidStep,sharePercent];
+
+                    $("#issue").attr("disabled", "disabled");
+                    try {
+                        var serialNumber = nebPay.call(toAddress,Unit.nasToBasic(Utils.toBigNumber(amount)),"addDinner",JSON.stringify(args),{
+                            qrcode: {
+                                showQRCode: false
+                            },
+                            goods: {
+                                name: "issue"
+                            },
+                            callback: localSave.getItem("callback"),
+                            listener: listener  //set listener for extension transaction result
+                        });
+                    } catch (e) {
+                        $("#issue").removeAttr("disabled");
+                        bootbox.dialog({
+                            backdrop: true,
+                            onEscape: true,
+                            message: e,
+                            size: "large",
+                            title: "Error"
+                        });
+                    }
+                }
+            }
+
+            function listener(resp) {
+                $("#issue").removeAttr("disabled");
+                console.log("resp: " + JSON.stringify(resp))
+            }
+        </script>
+</body>
+</html>

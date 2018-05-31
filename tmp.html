@@ -1,0 +1,166 @@
+<!doctype>
+<html>
+
+<head>
+    <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/ui-block.css" rel="stylesheet">
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <title>一起吃饭吧！</title>
+    <meta name=viewport content="width=device-width">
+    <meta charset="utf-8">
+</head>
+<body>
+    <div class=logo-main></div>
+    <div class="title" style="text-align: center;"></div>
+    <div class="header"></div>
+
+    <div id="list" class="container transfer">
+        <div class="form-group row">
+            <div class=col>
+
+<div style="text-align:center;">
+    <img style="width:60%" src="https://nebulas.io/assets/images/users/user-hitters.jpg" class="card-img-top" alt="徐义吉">
+</div>
+<div class="card-block">
+    <h4 class="card-title">徐义吉</h4>
+    <p class="card-subtitle">创始人</p>
+    <p class="card-social-link"><a href="https://www.linkedin.com/in/hitters" target="_blank" class=""><i class="iconfont icon-linkedin"></i></a></p>
+    <p class="card-text">星云链（Nebulas）&amp; 小蚁（AntShares）创始人，前蚂蚁金服区块链平台部负责人，前谷歌反作弊小组成员，同济大学计算机学士。2013年起创办了中国首个区块链技术社区比特创业营（<a href="http://bitsclub.io/cn/index.html" target="_blank" class="btn-link btn-blue-outline">BitsClub</a>）、中国首个专注于区块链行业投资基金FBG。</p>
+</div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id=result class="container" >
+    </div>
+    
+    <div class=footer></div>
+
+    <script src="libs/jquery-3.3.1.min.js"></script>
+    <script src="libs/bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js" data-depends="jquery.slim"></script>
+    <script src="libs/external/jquery.md5.js"></script>
+    <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
+    <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/blockies.min.js"></script>
+    <script src="dist/nebulas.js"></script>
+    <script src="js/1-localSave.js"></script>
+    <script src="js/home.v1.js"></script>
+    <script src="js/i18n.js" data-depends="jquery.slim"></script>
+    <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+    <script>
+            "use strict";
+    
+            var nebulas = require("nebulas"),
+                Transaction = nebulas.Transaction,
+                Utils = nebulas.Utils,
+                Unit = nebulas.Unit,
+                neb = new nebulas.Neb(),
+                validateAll = uiBlock.validate();
+
+            var queryNet = getQueryVariable("net");
+
+            uiBlock.insert({
+                footer: ".footer",
+                title: ".title",
+                header: ".header",
+                iconAddress: ".icon-address",
+                logoMain: [".logo-main", queryNet, queryNet==null],
+                numberComma: ".number-comma",
+            });
+
+            neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
+            $("#queryByOwner").on("click", onClickQuery);
+
+            var queryAddr = getQueryVariable("addr");
+            if(queryAddr!=null) {
+                $(".icon-address.owner input").val(queryAddr);
+                onClickQuery();
+            }
+
+            function getInfo(result,param,ids,i) {
+                var hash = ids[i];
+                var a=JSON.stringify([hash]);
+                param.contract={"function":"getInfo","args":JSON.stringify([hash])};
+                neb.api.call(param)
+                .then(function(tx) {
+                    var centificate = JSON.parse(tx.result);
+                    var html = '<div class="certificate">'+centificate.text+
+                        '</div>';
+                    result.append(html);
+                    ++i;
+                    if(i<ids.length) {
+                        getInfo(result,param,ids,i);
+                    }
+                    else{
+                        $("#queryByOwner").removeAttr("disabled");
+                        var firstCertificate = result.children(".certificate").first();
+                        var pageWidth = firstCertificate.children().first().outerWidth();
+                        if(result.width()<pageWidth) {
+                            var offset = result.outerWidth(true)-firstCertificate.width();
+                            result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
+                            "transformOrigin":"left top"});
+                        }
+                    }
+                });
+            }
+    
+            function onClickQuery() {
+                var fromAddress, toAddress, amount, gaslimit, gasprice, nonce, contract;
+                if (validateAll()) {
+                    fromAddress = $(".icon-address.owner input").val();
+                    toAddress = localSave.getItem("contract");;
+                    amount = "0";
+                    gaslimit = 1000000;
+                    gasprice = 2000000;
+                    contract={"function":"listByOwner","args":JSON.stringify([fromAddress])}
+
+                    $("#queryByOwner").attr("disabled", "disabled");
+                    neb.api.getAccountState(fromAddress).then(function (resp) {
+                        nonce = parseInt(resp.nonce || 0) + 1;
+                        try {
+                            var temp = 
+                            {
+                                from: fromAddress,
+                                to: toAddress,
+                                value: Unit.nasToBasic(Utils.toBigNumber(amount)),
+                                nonce: parseInt(nonce),
+                                gasPrice: gasprice,
+                                gasLimit: gaslimit,
+                                contract: contract
+                            };
+                            var result = $("#result");
+                            result.html("");
+                            neb.api.call(temp).then(function(tx) {
+                                if(!tx||!tx.result){
+                                    result.html("query fails.");
+                                    $("#queryByOwner").removeAttr("disabled");                                                                
+                                    return;                                        
+                                }
+
+                                var ids = JSON.parse(tx.result).ids;
+                                if(!ids || ids.length===0) {
+                                    result.html("no data.");
+                                    $("#queryByOwner").removeAttr("disabled");                                                                
+                                }
+                                else {
+                                    getInfo(result,temp,ids,0);
+                                }
+                            });
+                        } catch (e) {
+                            $("#queryByOwner").removeAttr("disabled");                                                                
+                            bootbox.dialog({
+                                backdrop: true,
+                                onEscape: true,
+                                message: e,
+                                size: "large",
+                                title: "Error"
+                            });
+                        }
+                    })
+                }
+            }
+        </script>
+</body>
+</html>

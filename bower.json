@@ -1,0 +1,23 @@
+{
+  "name": "nascert",
+  "homepage": "https://github.com/nascert/nascert.github.io",
+  "description": "nebulas certificate",
+  "main": "index.html",
+  "keywords": [
+    "nebulas"
+  ],
+  "authors": [
+    "Jianxin Xu"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fancybox": "^3.3.5"
+  }
+}
