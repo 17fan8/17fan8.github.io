@@ -134,7 +134,7 @@ var i18n = function () {
             "transfer/from-address": "Issuer Address",
             "transfer/owner-address": "Receiver Address",
             "transfer/code": "Code",
-            rules:"Bidding during the event, each bid system will host the current bid deposit, and automatically return the deposit of the previous bidder. After the event is over, the highest bidder can get a chance to chat and chat with famous people. The deposit will be deducted by the system. For the operation and maintenance of the system; if the activity is set to be divided into proportions, all participants can receive activities divided into (amount received = maximum deposit * divided into proportions / number of bids)."
+            rules:"Rules: Bidding during the event, each bid system will host the current bid deposit, and automatically return the deposit of the previous bidder. After the event is over, the highest bidder can get a chance to chat and chat with famous people. The deposit will be deducted by the system. For the operation and maintenance of the system; if the activity is set to be divided into proportions, all participants can receive activities divided into (amount received = maximum deposit * divided into proportions / number of bids)."
         },
         zh: {
             title: "大佬约我来吃饭",
@@ -258,7 +258,7 @@ var i18n = function () {
             "transfer/from-address": "颁发者地址",
             "transfer/owner-address": "获奖者地址",
             "transfer/code": "认证代码",
-            rules:"在活动期间进行竞价，每次出价后系统会托管当前的竞价押金，并且自动退还前一出价人的押金，活动结束后出价最高者可赢得和饭主一起吃饭聊天的机会，押金将被系统扣除用作系统的运维；如果活动设置了分成比例，所有参与者都可以领取活动奖励（奖励金额=最高押金*分成比例/竞价次数）。"
+            rules:"活动规则：在活动期间进行竞价，每次出价后系统会托管当前的竞价押金，并且自动退还前一出价人的押金，活动结束后出价最高者可赢得和饭主一起吃饭聊天的机会，押金将被系统扣除用作系统的运维；如果活动设置了分成比例，所有参与者都可以领取活动奖励（奖励金额=最高押金*分成比例/竞价次数）。"
         }
     };
 
