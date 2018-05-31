@@ -234,7 +234,7 @@ var uiBlock = function () {
                      chainId: 1001, 
                      name: "Testnet", 
                      url: "https://testnet.nebulas.io", 
-                     contract:"n1tc8yyNhkqEBdpsGMwnJUDoDFB8gFSfC3y",
+                     contract:"n1xuZ9uhsxYjFzpXk9ay5JzfwM8qQKRfpS5",
                      explorer:"https://explorer.nebulas.io/#/testnet/",
                      callback:"https://pay.nebulas.io/api/pay",
                 }

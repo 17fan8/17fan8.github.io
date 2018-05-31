@@ -350,7 +350,7 @@ DinnerContract.prototype = {
         var topBidder = dinner.getTopBidder();
         if(!!topBidder) {
             var ownerNas = new BigNumber(topBidder.nasInWei);
-            var sharedNas = 0;
+            var sharedNas = new BigNumber(0);
             var from = Blockchain.transaction.from;
             if(bnPercent.gt(0) && bnPercent.lte(100)) {
                 var sharedUnit = ownerNas.times(bnPercent).div(100*dinner.bidders.length);
