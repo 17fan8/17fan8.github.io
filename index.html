@@ -17,7 +17,7 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                <div style="margin:2em;background-color:lightblue;border:1px dashed;border-radius: 4px;color: darkslategray;padding:1em;font-size: 2pm;">
+                <div style="margin:0.5em;background-color:lightblue;border:1px dashed;border-radius: 4px;color: darkslategray;padding:1em;font-size: 2pm;">
                     <span data-i18n="rules"></span>
                 </div>
             </div>
@@ -496,18 +496,21 @@
             var tookNas = Utils.toBigNumber(0);
             if(addr&&addr!="") {
                 var topBidNas = Utils.toBigNumber(0);
-                var bidders = dialog[0].dinner.bidders;
+                var dinner = dialog[0].dinner;
+                var bidders = dinner.bidders;
                 if(bidders.length>0) {
                     var topBidder = bidders[bidders.length-1];
                     topBidNas = topBidder.nas;
                 }
+
+                var sharedUnit = topBidNas.times(dinner.sharePercent).div(100*dinner.bidders.length);
                 for(var i=0;i<bidders.length;++i) {
                     var bidder = bidders[i];
                     if(bidder.addr==addr) {
                         if(!bidder.nasTook)
-                            sharedNas = sharedNas.plus(bidder.nas);
+                            sharedNas = sharedNas.plus(sharedUnit);
                         else
-                            tookNas = tookNas.plus(bidder.nas);
+                            tookNas = tookNas.plus(sharedUnit);
                     }
                 }
             }
