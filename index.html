@@ -169,7 +169,7 @@
         });
 
         var lang = localSave.getItem("lang");
-        if(typeof (webExtensionWallet) === "undefined") {
+        if((!os.isAndroid && !os.isPhone) && typeof (webExtensionWallet) === "undefined") {
             bootbox.dialog({
                 backdrop: true,
                 onEscape: true,

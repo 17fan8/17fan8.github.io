@@ -110,6 +110,17 @@
                 numberComma: ".number-comma",
             });
 
+            var lang = localSave.getItem("lang");
+            if((!os.isAndroid && !os.isPhone) && typeof (webExtensionWallet) === "undefined") {
+                bootbox.dialog({
+                    backdrop: true,
+                    onEscape: true,
+                    message: lang=='zh'?"需要安装 extensionWallet 插件！":"Need install extensionWallet plugin!",
+                    size: "large",
+                    title: "Error"
+                });
+            }
+
             neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
 
             neb.api.getNebState().then(function(state) {
