@@ -150,7 +150,6 @@
     <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
     <script>
         "use strict";
-
         var nebulas = require("nebulas"),
             Transaction = nebulas.Transaction,
             Utils = nebulas.Utils,
@@ -168,6 +167,17 @@
             logoMain: [".logo-main", queryNet, queryNet==null],
             numberComma: ".number-comma",
         });
+
+        var lang = localSave.getItem("lang");
+        if(typeof (webExtensionWallet) === "undefined") {
+            bootbox.dialog({
+                backdrop: true,
+                onEscape: true,
+                message: lang=='zh'?"需要安装 extensionWallet 插件！":"Need install extensionWallet plugin!",
+                size: "large",
+                title: "Error"
+            });
+        }
 
         neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
 
