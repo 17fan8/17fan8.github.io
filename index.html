@@ -289,11 +289,28 @@
             result.append(html);
         }
 
-        function getInfo(result,param,ids,i) {
-            var hash = ids[i];
+        function getNextInfo(result,param,ids,pos) {
+            --pos;
+            if(pos>=0) {
+                getInfo(result,param,ids,pos);
+            }
+            else{
+                var firstItem = result.children(".dinner").first();
+                var pageWidth = firstItem.children().first().outerWidth();
+                if(result.width()<pageWidth) {
+                    var offset = result.outerWidth(true)-firstItem.width();
+                    result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
+                    "transformOrigin":"left top"});
+                }
+            }
+        }
+
+        function getInfo(result,param,ids,pos) {
+            var hash = ids[pos];
             var dinner = dinners[hash];
             if (!!dinner) {
                 addDinner(result,dinner);
+                getNextInfo(result,param,ids,pos);
                 return;
             }
             param.contract={"function":"info","args":JSON.stringify([hash])};
@@ -311,19 +328,7 @@
                     }
                     dinners[dinner.hash] = dinner;
                     addDinner(result,dinner);
-                    ++i;
-                    if(i<ids.length) {
-                        getInfo(result,param,ids,i);
-                    }
-                    else{
-                        var firstItem = result.children(".dinner").first();
-                        var pageWidth = firstItem.children().first().outerWidth();
-                        if(result.width()<pageWidth) {
-                            var offset = result.outerWidth(true)-firstItem.width();
-                            result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
-                            "transformOrigin":"left top"});
-                        }
-                    }
+                    getNextInfo(result,param,ids,pos);
                 }
                 else {
                     console.log("parse dinner data fails.");
@@ -362,7 +367,7 @@
                         $("#queryByIssuer").removeAttr("disabled");                                                                
                     }
                     else {
-                        getInfo(result,temp,txResult.ids,0);
+                        getInfo(result,temp,txResult.ids,txResult.ids.length-1);
                     }
                 });
             } catch (e) {
