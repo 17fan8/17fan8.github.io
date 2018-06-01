@@ -259,6 +259,9 @@
             var decimal = getValueDecimal(dinner.minBidStep);
             var sharePercent = parseFloat(dinner.sharePercent||"0");
 
+            result.append('<div class="dinner" data-hash="' + dinner.hash + '">' + '</div>');
+            var dinnerDiv = result.children().last();
+
             const badges = '<span class="badge badge-info badge-pill">预计</span>';
             var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
             if(dinner.beginBlock>currentBlock) {
@@ -267,8 +270,8 @@
                 btnText = "我要竞价";
                 btnState = ' disabled=disabled';
                 btnClick = '';
-                startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15)+badges
-                endTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15)+badges;
+                startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges
+                endTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges;
             }
             else if(dinner.endBlock>currentBlock){
                 stateText = '<h6 style="text-align:center;">进行中('+currentBlock+')</h6>';
@@ -277,8 +280,8 @@
                 btnState = '';
                 btnClick = ' onclick="showBidDialog(this)"';
                 startTime = "";
-                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15)+badges;
-                queryBlockTime(result, ".begin-time", dinner.beginBlock);
+                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
+                queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
             }
             else {
                 var takeNas = getShareNas(dinner);
@@ -290,72 +293,70 @@
                 btnClick = ' onclick="onTakeNas(this)"';
                 startTime = "";
                 endTime = "";
-                queryBlockTime(result, ".begin-time", dinner.beginBlock);
-                queryBlockTime(result, ".end-time", dinner.endBlock);
+                queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
+                queryBlockTime(dinnerDiv, ".end-time", dinner.endBlock);
             }
                 
             var html =
-                '<div class="dinner" data-hash="' + dinner.hash + '">' +
-                    '<div class="form-group row">' +
-                        '<div class=col>' +
-                            '<h4>'+dinner.title+'</h4>' +
-                        '</div>' +
-                        '<div class="w-100"></div>' +
-                        '<div class="col text-nowrap">' +
-                            '<i style="color:#aaa;">hash:"'+ dinner.hash +'"</i><hr>' +
-                        '</div>' +
+                '<div class="form-group row">' +
+                    '<div class=col>' +
+                        '<h4>'+dinner.title+'</h4>' +
                     '</div>' +
-                    '<div class="form-group row">' +
-                        '<div class=col>' +
-                            dinner.text +
-                        '</div>'+
-                    '</div> <hr>'+
-                    '<div class=row>' +
-                        '<div class=col>' +
-                            stateText +
-                            '<div class="progress">' +
-                                '<div ' + progressClass + ' role="progressbar" ' +
-                                    'value='+currentBlock+' min=' + dinner.beginBlock + 
-                                    ' aria-valuemax=' + dinner.beginBlock + ' style="width:'+progressValue+'%;">'+
-                                '<span>'+progressValue+'%</span>'+
-                                '</div>' +
+                    '<div class="w-100"></div>' +
+                    '<div class="col text-nowrap">' +
+                        '<i style="color:#aaa;">hash:"'+ dinner.hash +'"</i><hr>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="form-group row">' +
+                    '<div class=col>' +
+                        dinner.text +
+                    '</div>'+
+                '</div> <hr>'+
+                '<div class=row>' +
+                    '<div class=col>' +
+                        stateText +
+                        '<div class="progress">' +
+                            '<div ' + progressClass + ' role="progressbar" ' +
+                                'value='+currentBlock+' min=' + dinner.beginBlock + 
+                                ' aria-valuemax=' + dinner.beginBlock + ' style="width:'+progressValue+'%;">'+
+                            '<span>'+progressValue+'%</span>'+
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="row">' +
-                        '<div class="col-md-12">' +
-                            '<span style="float:left;">' + dinner.beginBlock+'</span>' +
-                            '<span style="float:right;">' + dinner.endBlock+'</span>' +
-                        '</div>' +
-                    '</div> <hr>' +
-                    '<div class="row">' +
-                        '<div class="col-md-6 text-nowrap">' +
-                            '开始时间：<span class="begin-time">'+startTime+'</span>' +
-                        '</div>' +
-                        '<div class="col-md-6 text-nowrap">' +
-                            '结束时间：<span class="end-time">'+endTime+'</span>' +
-                        '</div>' +
-                        '<div class="col-md-6 text-nowrap">' + 
-                            '最高竞价：'+ topBidNas.toFixed(decimal) + ' NAS' +
-                        '</div>' +
-                        '<div class="col-md-6 text-nowrap">' + 
-                            '最高竞家：' + topBidderAddr +
-                        '</div>' +
-                        '<div class="col-md-6">' + 
-                            '竞价次数：'+ dinner.bidders.length + '次' +
-                        '</div>' +
-                        '<div class=col-md-6>' +
-                            '分成比例：'+ (dinner.sharePercent||0)+' %' +
-                        '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="col-md-12">' +
+                        '<span style="float:left;">' + dinner.beginBlock+'</span>' +
+                        '<span style="float:right;">' + dinner.endBlock+'</span>' +
                     '</div>' +
-                    '<hr>' +
-                    '<div class="row form-group">'+
-                        '<div class=col>' +
-                            '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
-                        '</div>' +
-                    '</div>'+
+                '</div> <hr>' +
+                '<div class="row">' +
+                    '<div class="col-md-6 text-nowrap">' +
+                        '开始时间：<span class="begin-time">'+startTime+'</span>' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' +
+                        '结束时间：<span class="end-time">'+endTime+'</span>' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' + 
+                        '最高竞价：'+ topBidNas.toFixed(decimal) + ' NAS' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' + 
+                        '最高竞家：' + topBidderAddr +
+                    '</div>' +
+                    '<div class="col-md-6">' + 
+                        '竞价次数：'+ dinner.bidders.length + '次' +
+                    '</div>' +
+                    '<div class=col-md-6>' +
+                        '分成比例：'+ (dinner.sharePercent||0)+' %' +
+                    '</div>' +
+                '</div>' +
+                '<hr>' +
+                '<div class="row form-group">'+
+                    '<div class=col>' +
+                        '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
+                    '</div>' +
                 '</div>';
-            result.append(html);
+            dinnerDiv.append(html);
         }
 
         function queryBlockTime(result,spanClassName,height) {
