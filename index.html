@@ -136,9 +136,9 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div style="text-align:center; padding:1.5em;">
-                    <span class="alert alert-danger">请点击右上角的“...”，选择在浏览器打开</span>
+                    <div style="color: saddlebrown;margin:2em 1em 1em;" >请点击右上角的“...”，选择在浏览器打开</div>
                     <br>
-                    <img style="border-radius:0.8em;"src="images/weixin-tip.png" >
+                    <img style="border-radius:0.8em;width: 64%;" src="images/weixin-tip.jpeg" >
                 </div>
             </div>
         </div>
@@ -193,7 +193,7 @@
         var NebPay = require("nebpay");
         var nebPay = new NebPay();
 
-        if(isWeixin()) {
+        if(!isWeixin()) {
             $("#weixin-tip").modal("show");
         }
         else {
