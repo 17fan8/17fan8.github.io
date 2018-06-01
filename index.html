@@ -193,7 +193,7 @@
         var NebPay = require("nebpay");
         var nebPay = new NebPay();
 
-        if(!isWeixin()) {
+        if(isWeixin()) {
             $("#weixin-tip").modal("show");
         }
         else {
