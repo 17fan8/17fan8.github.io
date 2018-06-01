@@ -79,7 +79,7 @@ var uiBlock = function () {
                 .html(
                     "<div>" +
                     "    <h1> <span data-i18n=title> </h1>" +
-                    "    <h4> <span data-i18n=subtitle> </h4>" +
+                    "    <br>" +
                     "</div>" +
                     "<br>"));
         }
@@ -234,7 +234,7 @@ var uiBlock = function () {
                      chainId: 1001, 
                      name: "Testnet", 
                      url: "https://testnet.nebulas.io", 
-                     contract:"n1xuZ9uhsxYjFzpXk9ay5JzfwM8qQKRfpS5",
+                     contract:"n1pRXS4KWY5bgEPHF2pkhpZmXcdGRQE6ofU",
                      explorer:"https://explorer.nebulas.io/#/testnet/",
                      callback:"https://pay.nebulas.io/api/pay",
                 }
@@ -279,7 +279,7 @@ var uiBlock = function () {
                 .addClass("container logo-main")
                 .html(
                     "<div class=row>" +
-                    "    <div class=col></div>" +
+                    '    <div class=col><img style="width: 64px;" src="images/food.png"></div>' +
                     "    <div class=col>" + (showMenu?
                     "        <div class=dropdown>" +
                     '            <button class="btn dropdown-toggle" id=logo-main-dropdown-1 data-toggle=dropdown aria-haspopup=true aria-expanded=false>' + sApiText + "</button>" +

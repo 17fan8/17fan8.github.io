@@ -16,8 +16,16 @@
     <div class="title" style="text-align: center;"></div>
     <div class="container">
         <div class="row">
+            <div class="col-md-12">
+                <div id="bind-addr-box" class="alert text-nowrap">
+                    <span>当前绑定地址：</span>
+                    <span id="bind-addr"></span>                
+                    <!--a style="float:right;" onclick="onClearBindAddr()">清空</a-->
+                    <a style="float:right;" data-toggle="modal" data-target="#bind-addr-dialog">修改</a>
+                </div>
+            </div>
             <div class="col">
-                <div style="margin:0.5em;background-color:lightblue;border:1px dashed;border-radius: 4px;color: darkslategray;padding:1em;font-size: 2pm;">
+                <div style="background-color:lightblue;border:2px dashed;border-radius: 4px;color: darkslategray;padding:1em;font-size: 2pm;">
                     <span data-i18n="rules"></span>
                 </div>
             </div>
@@ -84,14 +92,14 @@
         </div>
     </div>
 
-    <!-- 领取分成对话框 -->
-    <div class="modal fade" id="take-nas-dialog">
+    <!-- 绑定钱包地址对话框 -->
+    <div class="modal fade" id="bind-addr-dialog">
         <div class="modal-dialog">
             <div class="modal-content">
 
                 <!-- 模态框头部 -->
                 <div class="modal-header">
-                    <h4 id="take-nas-title" class="modal-title">分成</h4>
+                    <h4 id="bind-addr-title" class="modal-title">绑定钱包</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
@@ -100,16 +108,8 @@
                     <div class="container" >
                         <div class="row from-group">
                             <div class="col-md-12">
-                                <label for="take-nas-addr">钱包地址（请确保领取地址与本地址一致）：</label>
-                                <input  name="nas-addr" id="take-nas-addr" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="take-nas-sharedNas">可领取NAS：</label>
-                                <input id="take-nas-sharedNas" class="form-control" readonly=readonly>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="take-nas-tookNas">已领取NAS：</label>
-                                <input id="take-nas-tookNas" class="form-control" readonly=readonly>
+                                <label for="bind-addr-addr">钱包地址（请用该钱包参与活动）：</label>
+                                <div class="icon-address" placeholder="输入要绑定的钱包地址"></div>
                             </div>
                         </div>
                     </div>
@@ -119,17 +119,26 @@
                 <div class="modal-footer form-group">
                     <div class="container" >
                         <div class=row>
-                            <div class="col-md-4">
+                            <div class="col-md-4 offset-md-2">
                                 <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
                             </div>
                             <div class="col-md-4">
-                                <button type="button" class="btn btn-block btn-mutil-line" onclick="updateTakeNasDialog()">查询</button>
-                            </div>
-                            <div class="col-md-4">
-                                <button id="take-nas-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onTakeNas()">领取</button>
+                                <button id="bind-addr-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onBindAddr()">绑定</button>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pill">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div style="text-align:center; padding:1.5em;">
+                    <span>请点击右上角的“...”，选择在浏览器打开</span>
+                    <br>
+                    <img src="images/food.png" >
                 </div>
             </div>
         </div>
@@ -183,6 +192,22 @@
 
         var NebPay = require("nebpay");
         var nebPay = new NebPay();
+
+        if(isWeixin()) {
+            $("#weixin-tip").modal("show");
+        }
+        else {
+            var bindAddr=localStorage.getItem("bindAddr");
+            if(!bindAddr||bindAddr=="") {
+                $("#bind-addr-dialog").modal("show");
+                $("#bind-addr").text("未绑定");
+                $("#bind-addr-box").addClass("alert-warning")
+            }
+            else {
+                $("#bind-addr").text(bindAddr);
+                $("#bind-addr-box").addClass("alert-success")
+            }
+        }
         
         var currentBlock = 0;
         neb.api.getNebState().then(function(state) {
@@ -190,15 +215,42 @@
             listByIssuer("n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8");
         });
 
-        $("#take-nas-addr").on("change", function(event) {
-            updateTakeNasDialog();
-        });
+        //计算可领取的NAS
+        function getShareNas(dinner) {
+            var sharedNas = Utils.toBigNumber(0);
+            var tookNas = Utils.toBigNumber(0);
+            if(bindAddr&&bindAddr!="") {
+                var topBidNas = Utils.toBigNumber(0);
+                var bidders = dinner.bidders;
+                if(bidders.length>0) {
+                    var topBidder = bidders[bidders.length-1];
+                    topBidNas = topBidder.nas;
+                }
+
+                var sharedUnit = topBidNas.times(dinner.sharePercent).div(100*dinner.bidders.length);
+                for(var i=0;i<bidders.length;++i) {
+                    var bidder = bidders[i];
+                    if(bidder.addr==bindAddr) {
+                        if(!bidder.nasTook)
+                            sharedNas = sharedNas.plus(sharedUnit);
+                        else
+                            tookNas = tookNas.plus(sharedUnit);
+                    }
+                }
+            }
+            return {sharedNas:sharedNas,tookNas:tookNas};
+        }
         
         var dinners={};
         function addDinner(result,dinner) {
-            var progressValue = currentBlock>0?(currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock):0;
-            if(progressValue>100)
-                progressValue=100;
+            var progressValue =0;
+            if(dinner.endBlock>dinner.beginBlock) {
+                progressValue= ((currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock)).toFixed(2);
+                if(progressValue<0)
+                    progressValue=0;
+                if(progressValue>100)
+                    progressValue=100;
+            }
             var topBidNas = Utils.toBigNumber(0), topBidderAddr="空缺";
             if(dinner.bidders.length>0) {
                 var topBidder = dinner.bidders[dinner.bidders.length-1];
@@ -208,13 +260,16 @@
             var decimal = getValueDecimal(dinner.minBidStep);
             var sharePercent = parseFloat(dinner.sharePercent||"0");
 
-            var stateText,progressClass,btnText,btnState,btnClick;
+            const badges = '<span class="badge badge-info badge-pill">预计</span>';
+            var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
             if(dinner.beginBlock>currentBlock) {
                 stateText = '<h6 style="text-align:center;">未开始('+currentBlock+')</h6>';
                 progressClass='class="progress-bar progress-bar-striped bg-info"';
                 btnText = "我要竞价";
                 btnState = ' disabled=disabled';
                 btnClick = '';
+                startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15)+badges
+                endTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15)+badges;
             }
             else if(dinner.endBlock>currentBlock){
                 stateText = '<h6 style="text-align:center;">进行中('+currentBlock+')</h6>';
@@ -222,13 +277,22 @@
                 btnText = "我要竞价";
                 btnState = '';
                 btnClick = ' onclick="showBidDialog(this)"';
+                startTime = "";
+                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15)+badges;
+                queryBlockTime(result, ".begin-time", dinner.beginBlock);
             }
             else {
+                var takeNas = getShareNas(dinner);
                 stateText = '<h6 style="text-align:center;">已完成('+currentBlock+')</h6>';
                 progressClass='class="progress-bar bg-info"';
-                btnText = "分成";
-                btnState = sharePercent<=0?' disabled=disabled':'';
-                btnClick = ' onclick="showTakeNasDialog(this)"';
+                btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
+                    (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
+                btnState = takeNas.sharedNas.eq(0)?' disabled=disabled':'';
+                btnClick = ' onclick="onTakeNas(this)"';
+                startTime = "";
+                endTime = "";
+                queryBlockTime(result, ".begin-time", dinner.beginBlock);
+                queryBlockTime(result, ".end-time", dinner.endBlock);
             }
                 
             var html =
@@ -246,7 +310,7 @@
                         '<div class=col>' +
                             dinner.text +
                         '</div>'+
-                    '</div>'+
+                    '</div> <hr>'+
                     '<div class=row>' +
                         '<div class=col>' +
                             stateText +
@@ -260,13 +324,19 @@
                         '</div>' +
                     '</div>' +
                     '<div class="row">' +
-                        '<div class="col">' +
+                        '<div class="col-md-12">' +
                             '<span style="float:left;">' + dinner.beginBlock+'</span>' +
                             '<span style="float:right;">' + dinner.endBlock+'</span>' +
                         '</div>' +
                     '</div> <hr>' +
                     '<div class="row">' +
-                        '<div class="col-md-6">' + 
+                        '<div class="col-md-6 text-nowrap">' +
+                            '开始时间：<span class="begin-time">'+startTime+'</span>' +
+                        '</div>' +
+                        '<div class="col-md-6 text-nowrap">' +
+                            '结束时间：<span class="end-time">'+endTime+'</span>' +
+                        '</div>' +
+                        '<div class="col-md-6 text-nowrap">' + 
                             '最高竞价：'+ topBidNas.toFixed(decimal) + ' NAS' +
                         '</div>' +
                         '<div class="col-md-6 text-nowrap">' + 
@@ -282,11 +352,17 @@
                     '<hr>' +
                     '<div class="row form-group">'+
                         '<div class=col>' +
-                            '<button class="btn btn-block" data-toggle="modal" '+btnState+btnClick+'">'+btnText+'</button>' +
+                            '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
                         '</div>' +
                     '</div>'+
                 '</div>';
             result.append(html);
+        }
+
+        function queryBlockTime(result,spanClassName,height) {
+            neb.api.getBlockByHeight({height:height,fullTransaction:false}).then(function(block) {
+                result.find(spanClassName).text(formatTime(block.timestamp*1000));
+            });
         }
 
         function getNextInfo(result,param,ids,pos) {
@@ -401,6 +477,9 @@
                     callback: localSave.getItem("callback"),
                     listener: listener  //set listener for extension transaction result
                 });
+
+                $("#bid-ok").removeAttr("disabled");
+                $("#bid-dialog").modal('toggle');
             } catch (e) {
                 $("#bid-ok").removeAttr("disabled");
                 bootbox.dialog({
@@ -411,24 +490,50 @@
                     title: "Error"
                 });
             }
+
+            var intervalQuery = setInterval(function () {
+                funcIntervalQuery();
+            }, 10000);
+
+            function funcIntervalQuery() {
+                var options = {
+                    callback: localSave.getItem("callback")
+                }
+                nebPay.queryPayInfo(serialNumber,options)   //search transaction result from server (result upload to server by app)
+                .then(function (resp) {
+                    console.log("tx result: " + resp)   //resp is a JSON string
+                    var respObject = JSON.parse(resp)
+                    if(respObject.code === 0){
+                        clearInterval(intervalQuery);
+                    }
+                    //todo reflash dinner
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+            }
+
+            function listener(resp) {
+                console.log("resp: " + JSON.stringify(resp))
+            }
         }
 
-        function listener(resp) {
-            $("#bid-ok").removeAttr("disabled");
-            $("#bid-dialog").modal('hide');
-            console.log("resp: " + JSON.stringify(resp))
-        }
-
-        function onTakeNas() {
-            var hash, toAddress, addr, amount, args;
-            toAddress = localSave.getItem("contract");                
-            addr = $("#take-nas-addr").val();
+        function onTakeNas(btn) {
+            var hash, toAddress, amount, args;
+            hash = $(btn).closest(".dinner").attr("data-hash");
+            toAddress = localSave.getItem("contract");
             amount = "0";
-            hash = $("#take-nas-dialog").attr("data-hash");
             args=[hash];
-
-            $("#take-nas-ok").attr("disabled", "disabled");
             try {
+                var dinner = dinners[hash];
+                for(var i=0;i<dinner.bidders.length;++i) {
+                    if(dinner.bidders[i].addr == bindAddr)
+                        dinner.bidders[i].tookNas=true;
+                }
+                $(btn).attr("disabled","disabled");
+                var btnText = $(btn).text();
+                $(btn).text(btnText.replace("可","已"));
+
                 var serialNumber = nebPay.call(toAddress,amount,"takeNasByBidder",JSON.stringify(args),{
                     qrcode: {
                         showQRCode: false
@@ -438,8 +543,6 @@
                     },
                     callback: localSave.getItem("callback"),
                     listener: function(resp){
-                        $("#take-nas-ok").removeAttr("disabled");
-                        $("#take-nas-dialog").modal('hide');
                         console.log("resp: " + JSON.stringify(resp))
                     }  //set listener for extension transaction result
                 });
@@ -456,8 +559,6 @@
                         console.log("tx result: " + resp)   //resp is a JSON string
                         var respObject = JSON.parse(resp)
                         if(respObject.code === 0){
-                            $("#take-nas-ok").removeAttr("disabled");
-                            $("#take-nas-dialog").modal('hide');
                             clearInterval(intervalQuery);
                         }
                     })
@@ -466,7 +567,6 @@
                     });
                 }
             } catch (e) {
-                $("#take-nas-ok").removeAttr("disabled");
                 bootbox.dialog({
                     backdrop: true,
                     onEscape: true,
@@ -476,7 +576,6 @@
                 });
             }
         }
-
 
         function showBidDialog(btn){
             var hash = $(btn).closest(".dinner").attr("data-hash");
@@ -517,50 +616,24 @@
                 dlgNumber[0].slide=true;
             }
         }
-        function updateTakeNasDialog() {
-            var dialog = $("#take-nas-dialog");
-            var addr = dialog.find("#take-nas-addr").val();
-            var sharedNas = Utils.toBigNumber(0);
-            var tookNas = Utils.toBigNumber(0);
-            if(addr&&addr!="") {
-                var topBidNas = Utils.toBigNumber(0);
-                var dinner = dialog[0].dinner;
-                var bidders = dinner.bidders;
-                if(bidders.length>0) {
-                    var topBidder = bidders[bidders.length-1];
-                    topBidNas = topBidder.nas;
-                }
 
-                var sharedUnit = topBidNas.times(dinner.sharePercent).div(100*dinner.bidders.length);
-                for(var i=0;i<bidders.length;++i) {
-                    var bidder = bidders[i];
-                    if(bidder.addr==addr) {
-                        if(!bidder.nasTook)
-                            sharedNas = sharedNas.plus(sharedUnit);
-                        else
-                            tookNas = tookNas.plus(sharedUnit);
-                    }
-                }
+        function onBindAddr() {
+            var validateAll = uiBlock.validate("#bind-addr-dialog");
+            if (validateAll()) {
+                bindAddr = $("#bind-addr-dialog .icon-address input").val();
+                localStorage.setItem("bindAddr",bindAddr);
+                $("#bind-addr").text(bindAddr);
+                $("#bind-addr-box").removeClass("alert-warning");
+                $("#bind-addr-box").addClass("alert-success");
+                $("#bind-addr-dialog").modal("toggle");
             }
-            dialog.find("#take-nas-sharedNas").val(sharedNas);
-            dialog.find("#take-nas-tookNas").val(tookNas);
-            if(sharedNas.lte(0))
-                dialog.find("#take-nas-ok").attr("disabled","disabled");
-            else
-                dialog.find("#take-nas-ok").removeAttr("disabled");
         }
-        function showTakeNasDialog(btn) {
-            var hash = $(btn).closest(".dinner").attr("data-hash");
-            var dialog = $("#take-nas-dialog");
-            var dinner = dialog[0].dinner = dinners[hash];
-            if(!!dinner) {
-                $("#take-nas-title").text("分成 - "+dinner.title);
-
-                updateTakeNasDialog(dinner);
-
-                dialog.attr("data-hash",hash);
-                dialog.modal('show');
-            }
+        function onClearBindAddr() {
+            bindAddr="";
+            localStorage.setItem("bindAddr",bindAddr);
+            $("#bind-addr").text(bindAddr);
+            $("#bind-addr-box").removeClass("alert-success");
+            $("#bind-addr-box").addClass("alert-warning");
         }
     </script>
 </body>

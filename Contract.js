@@ -66,6 +66,7 @@ var Dinner = function(obj) {
         this.beginBlock = obj.beginBlock;   //开始报名区块号
         this.endBlock = obj.endBlock;       //结束报名区块号
         this.nasTook = obj.nasTook;                 //nas是否已经领取
+        this.locked = obj.locked;                       //是否锁定，锁定后不能竞价，不能领取奖励
         this.bidders = obj.bidders||[];             //竞投的历史记录
         this.minBidStep = obj.minBidStep||"0.1";    //竞价起跳最多NAS数
         this.maxBidStep = obj.maxBidStep||"5";      //竞价起跳最多NAS数
@@ -268,6 +269,9 @@ DinnerContract.prototype = {
         if(!dinner) {
             return "no dinner matched!";
         }
+        if(dinner.locked) {
+            return "is locked!";
+        }
 
         var result = dinner.bid(Blockchain.transaction.hash,
             Blockchain.transaction.from,
@@ -278,6 +282,58 @@ DinnerContract.prototype = {
             return result;
         this.dinners.set(hash,dinner);
         return "ok";
+    },
+
+    //设置领取比例
+    setSharePercent:function(hash, newPercent) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            return "no dinner matched!";
+        }
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            return "not owner address!"
+        }
+        dinner.sharePercent = newPercent;
+        this.dinners.set(hash,dinner);
+    },
+    
+    //设置开始区块
+    setBeginBlock:function(hash, beginBlock) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            return "no dinner matched!";
+        }
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            return "not owner address!"
+        }
+        dinner.beginBlock = beginBlock;
+        this.dinners.set(hash,dinner);
+    },
+
+    //设置结束区块
+    setEndBlock:function(hash, endBlock) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            return "no dinner matched!";
+        }
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            return "not owner address!"
+        }
+        dinner.endBlock = endBlock;
+        this.dinners.set(hash,dinner);
+    },
+
+    //冻结活动
+    lock:function(hash,locked) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            return "no dinner matched!";
+        }
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            return "not owner address!"
+        }
+        dinner.locked = locked;
+        this.dinners.set(hash,dinner);
     },
 
     //领取Nas
@@ -339,6 +395,10 @@ DinnerContract.prototype = {
 
         if(dinner.isActive()) {
             return "bid has not stopped!";
+        }
+
+        if(dinner.locked) {
+            return "is locked!";
         }
 
         var bnPercent = new BigNumber(dinner.sharePercent);
