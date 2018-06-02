@@ -132,6 +132,50 @@
         </div>
     </div>
 
+    <!-- 登记联系方式 -->
+    <div class="modal fade" id="contact-info-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 id="bind-addr-title" class="modal-title">提交联系方式</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="container" >
+                        <div class="row from-group">
+                            <div class="col-md-12">
+                                <h6 id="congratulations" style="color:tomato">恭喜</h4>
+                            </div>
+                        </div>
+                        <div class="row from-group">
+                            <div class="col-md-12">
+                                <label for="contact-info">联系方式：</label>
+                                <input id="contact-info" class="form-control" placeholder="输入有效的联系方式，如手机号码、微信号、qq号等">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer form-group">
+                    <div class="container" >
+                        <div class=row>
+                            <div class="col-md-4 offset-md-2">
+                                <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="contact-info-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onSubmitContactInfo()">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="weixin-tip">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -255,6 +299,17 @@
                 var topBidder = dinner.bidders[dinner.bidders.length-1];
                 topBidNas = topBidder.nas;
                 topBidderAddr = topBidder.addr;
+
+                //提示玩家登记联系地址
+                if(currentBlock>=dinner.endBlock && topBidder.addr==bindAddr && (!dinner.contactInfo||dinner.contactInfo=="")) {
+                    var dlgDOM = $("#contact-info-dialog")[0];
+                    if(!dlgDOM.dinners) {
+                        dlgDOM.dinners=[dinner];
+                    }
+                    else {
+                        dlgDOM.dinners.push(dinner);
+                    }                
+                }
             }
             var decimal = getValueDecimal(dinner.minBidStep);
             var sharePercent = parseFloat(dinner.sharePercent||"0");
@@ -262,6 +317,7 @@
             result.append('<div class="dinner" data-hash="' + dinner.hash + '">' + '</div>');
             var dinnerDiv = result.children().last();
 
+            const lockStr = dinner.locked?"(暂停)":"";
             const badges = '<span class="badge badge-info badge-pill">预计</span>';
             var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
             if(dinner.beginBlock>currentBlock) {
@@ -277,11 +333,10 @@
                 stateText = '<h6 style="text-align:center;">进行中('+currentBlock+')</h6>';
                 progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-info"';
                 btnText = "我要竞价";
-                btnState = '';
+                btnState = dinner.locked?' disabled=disabled':'';
                 btnClick = ' onclick="showBidDialog(this)"';
-                startTime = "";
+                startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
                 endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
-                queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
             }
             else {
                 var takeNas = getShareNas(dinner);
@@ -289,12 +344,10 @@
                 progressClass='class="progress-bar bg-info"';
                 btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
                     (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
-                btnState = takeNas.sharedNas.eq(0)?' disabled=disabled':'';
+                btnState = (takeNas.sharedNas.eq(0)||dinner.locked)?' disabled=disabled':'';
                 btnClick = ' onclick="onTakeNas(this)"';
-                startTime = "";
-                endTime = "";
-                queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
-                queryBlockTime(dinnerDiv, ".end-time", dinner.endBlock);
+                startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
+                endTime = queryBlockTime(dinnerDiv, ".end-time", dinner.endBlock);
             }
                 
             var html =
@@ -360,9 +413,16 @@
         }
 
         function queryBlockTime(result,spanClassName,height) {
+            var timestamp = localStorage.getItem("blockTime."+height);
+            if(timestamp) {
+                return formatTime(parseInt(timestamp)*1000);
+            }
+            
             neb.api.getBlockByHeight({height:height,fullTransaction:false}).then(function(block) {
+                localStorage.setItem("blockTime."+height,block.timestamp);
                 result.find(spanClassName).text(formatTime(block.timestamp*1000));
             });
+            return "";
         }
 
         function getNextInfo(result,param,ids,pos) {
@@ -371,6 +431,7 @@
                 getInfo(result,param,ids,pos);
             }
             else{
+                //没有下一个活动了
                 var firstItem = result.children(".dinner").first();
                 var pageWidth = firstItem.children().first().outerWidth();
                 if(result.width()<pageWidth) {
@@ -378,6 +439,19 @@
                     result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
                     "transformOrigin":"left top"});
                 }
+
+                var dlgDOM = $("#contact-info-dialog")[0];
+                if(dlgDOM.dinners) {
+                    let congratulations = '恭喜你赢得了:';
+                    for(let i=0;i<dlgDOM.dinners.length;++i) {
+                        congratulations+= '"' + dlgDOM.dinners[i].title + '"';
+                        if(i+1<dlgDOM.dinners.length)
+                            congratulations+="、"
+                    }
+                    congratulations+="，请赶紧提交你的联系方式，好让我们找到你吧！"
+                    $("#congratulations").text(congratulations);
+                    $("#contact-info-dialog").modal("show");  
+                }  
             }
         }
 
@@ -634,6 +708,43 @@
             $("#bind-addr").text(bindAddr);
             $("#bind-addr-box").removeClass("alert-success");
             $("#bind-addr-box").addClass("alert-warning");
+        }
+
+        function onSubmitContactInfo(btn) {
+            var hash, toAddress, amount, args;
+            toAddress = localSave.getItem("contract");
+            amount = "0";
+            var dlgDOM = $("#contact-info-dialog")[0];
+            var contactInfo = $("#contact-info").val();
+            if(dlgDOM.dinners) {
+                for(let i=0;i<dlgDOM.dinners.length;++i) {
+                    hash = dlgDOM.dinners[i].hash;
+                    args=[hash,contactInfo];
+                    try {
+                        var serialNumber = nebPay.call(toAddress,amount,"setContactInfo",JSON.stringify(args),{
+                            qrcode: {
+                                showQRCode: false
+                            },
+                            goods: {
+                                name: "setContactInfo"
+                            },
+                            callback: localSave.getItem("callback"),
+                            listener: function(resp){
+                                console.log("resp: " + JSON.stringify(resp))
+                            }  //set listener for extension transaction result
+                        });
+                    } catch (e) {
+                        bootbox.dialog({
+                            backdrop: true,
+                            onEscape: true,
+                            message: e,
+                            size: "large",
+                            title: "Error"
+                        });
+                    }
+                }
+            }
+            $("#contact-info-dialog").modal("toggle");
         }
     </script>
 </body>
