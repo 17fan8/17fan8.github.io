@@ -1,3 +1,7 @@
+body{
+  background-color:#f5f3f2;
+}
+
 a {
   color: #00B7FF;
 }
@@ -15,17 +19,54 @@ span.ok{
 }
 
 .dinner{
-  margin: 0.8em 0;
-  border: 2px solid #e06400;
+  margin-bottom: 0.5em;
   border-radius: 0.3em;
-  padding: 1.5em 1.5em;
 }
 
+.badge-info{
+  background-color: #fff4eb;
+  color:#e06400;
+}
+.badge-info.na{
+  color: #ed9c6d;
+}
+
+.icon-xinxi {
+  color:#e06400;  
+}
+.icon-xinxi.na {
+  color:#ed9c6d;  
+}
 .cert-title{
   text-align: center;
   color: coral;
 }
 
+.bg-dinner {
+  background-color: #e06400 !important;
+}
+
+.bg-dinner.na{
+  background-color: #ed9c6d !important;
+}
+
+.card-body {
+  padding:1em;
+}
+.card-header{
+  padding:0.7em 1em;
+  color: #fff4eb;
+}
+
+.card-header.na{
+  padding:0.7em 1em;
+  color: #ffffff;
+}
+
+.header-hash {
+  margin-bottom:-0.6em;
+  color:#fdd9c4;
+}
 .cert-name{
   text-align: left;
 }
@@ -56,4 +97,12 @@ span.ok{
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.dinner-header.collapsed > h5 > span.iconfont:before {
+  content: "\e601";
+}
+
+.dinner-header > h5 > span.iconfont:before {
+  content: "\e600";
 }

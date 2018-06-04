@@ -4,29 +4,37 @@
 <head>
     <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.css" rel="stylesheet">
     <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet">
+    <link href="fonts/iconfont.css" rel="stylesheet">
     <link href="stylesheets/style.css" rel="stylesheet">
     <link href="stylesheets/ui-block.css" rel="stylesheet">
     <link href="stylesheets/base.css" rel="stylesheet">
     <title>一起吃饭吧！</title>
     <meta name=viewport content="width=device-width">
     <meta charset="utf-8">
+    <style>
+     .tooltip-inner > p {
+        text-align:left;
+    }
+ </style>
 </head>
 <body>
     <div class=logo-main></div>
     <div class="title" style="text-align: center;"></div>
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
-                <div id="bind-addr-box" class="alert text-nowrap">
-                    <span>绑定地址：</span>
-                    <span id="bind-addr"></span>                
-                    <!--a style="float:right;" onclick="onClearBindAddr()">清空</a-->
-                    <div style="float:right;cursor: hand;" data-toggle="modal" data-target="#bind-addr-dialog">修改</div>
+            <div class="col">
+                <div style="border:2px solid;border-radius: 4px;padding:1em;font-size: 2pm;">
+                    <span data-i18n="rules"></span>
                 </div>
             </div>
-            <div class="col">
-                <div style="background-color:lightblue;border:2px dashed;border-radius: 4px;color: darkslategray;padding:1em;font-size: 2pm;">
-                    <span data-i18n="rules"></span>
+            <div class="col-md-12">
+                <div id="bind-addr-box" class="alert" style="font-size:0.8em; margin-top:1rem;">
+                    <div style="width:3em;float:right;cursor: hand;" data-toggle="modal" data-target="#bind-addr-dialog">修改</div>
+                    <div class="text-nowrap" style="margin-right:3em;">
+                        <span>绑定地址：</span>
+                        <span id="bind-addr"></span>                
+                        <!--a style="float:right;" onclick="onClearBindAddr()">清空</a-->
+                    </div>
                 </div>
             </div>
         </div>
@@ -285,7 +293,8 @@
         }
         
         var dinners={};
-        function addDinner(result,dinner) {
+        function addDinner(result,dinner,no) {
+            var isFirstItem = result.children(".dinner").length==0;
             var progressValue =0;
             if(dinner.endBlock>dinner.beginBlock) {
                 progressValue= ((currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock)).toFixed(2);
@@ -314,53 +323,69 @@
             var decimal = getValueDecimal(dinner.minBidStep);
             var sharePercent = parseFloat(dinner.sharePercent||"0");
 
-            result.append('<div class="dinner" data-hash="' + dinner.hash + '">' + '</div>');
-            var dinnerDiv = result.children().last();
-
             const lockStr = dinner.locked?"(暂停)":"";
-            const badges = '<span class="badge badge-info badge-pill">预计</span>';
+            const badges = '<span class="badge badge-info badge-pill" data-toggle="tooltip" title="本时间根据区块高度计算得到">预计</span>';
             var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
+            var na;
             if(dinner.beginBlock>currentBlock) {
                 stateText = '<h6 style="text-align:center;">未开始('+currentBlock+')</h6>';
-                progressClass='class="progress-bar progress-bar-striped bg-info"';
+                progressClass='class="progress-bar progress-bar-striped bg-dinner"';
                 btnText = "我要竞价";
                 btnState = ' disabled=disabled';
                 btnClick = '';
                 startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges
                 endTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges;
+                na=' na';
             }
             else if(dinner.endBlock>currentBlock){
                 stateText = '<h6 style="text-align:center;">进行中('+currentBlock+')</h6>';
-                progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-info"';
+                progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-dinner"';
                 btnText = "我要竞价";
                 btnState = dinner.locked?' disabled=disabled':'';
                 btnClick = ' onclick="showBidDialog(this)"';
                 startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
                 endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
+                na='';
             }
             else {
                 var takeNas = getShareNas(dinner);
                 stateText = '<h6 style="text-align:center;">已完成('+currentBlock+')</h6>';
-                progressClass='class="progress-bar bg-info"';
+                progressClass='class="progress-bar bg-dinner"';
                 btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
                     (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
                 btnState = (takeNas.sharedNas.eq(0)||dinner.locked)?' disabled=disabled':'';
                 btnClick = ' onclick="onTakeNas(this)"';
                 startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
                 endTime = queryBlockTime(dinnerDiv, ".end-time", dinner.endBlock);
+                na=' na';
+            }
+
+            var collapseState;
+            var collapseShow;
+            if(isFirstItem) {
+                collapseState = '';
+                collapseShow = ' show';
+            }
+            else {
+                collapseState = ' collapsed';
+                collapseShow = '';
             }
                 
+            result.append('<div class="dinner card'+na+'" data-hash="' + dinner.hash + '">' + '</div>');
+            var dinnerDiv = result.children().last();
+
             var html =
-                '<div class="form-group row">' +
-                    '<div class=col>' +
-                        '<h4>'+dinner.title+'</h4>' +
-                    '</div>' +
-                    '<div class="w-100"></div>' +
-                    '<div class="col text-nowrap">' +
-                        '<i style="color:#aaa;">hash:"'+ dinner.hash +'"</i><hr>' +
+                '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+no+'">' +
+                    '<span class="badge badge-pill badge-info'+na+'">第'+no+'期</span>' +
+                    '<h5><span class="float-right iconfont"></span>'  +
+                    '<span style="margin-right:2em">'+dinner.title+'</span></h5>' +
+                    '<div class="text-nowrap header-hash">' +
+                        '<i style="font-size:0.8em">hash:"'+ dinner.hash +'"</i><br>' +
                     '</div>' +
                 '</div>' +
+                '<div id="dinner-body-'+no+'" class="card-body form-group collapse'+collapseShow+'" data-parent="#result">' +
                 '<div class="form-group row">' +
+                    '<div class="w-100"></div>' +
                     '<div class=col>' +
                         dinner.text +
                     '</div>'+
@@ -400,7 +425,7 @@
                         '竞价次数：'+ dinner.bidders.length + '次' +
                     '</div>' +
                     '<div class=col-md-6>' +
-                        '分成比例：'+ (dinner.sharePercent||0)+' %' +
+                        '<a data-toggle="tooltip" data-html=true title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：'+ (dinner.sharePercent||0)+' % <span class="iconfont icon-xinxi"></span></a>' +
                     '</div>' +
                 '</div>' +
                 '<hr>' +
@@ -408,6 +433,7 @@
                     '<div class=col>' +
                         '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
                     '</div>' +
+                '</div>' +
                 '</div>';
             dinnerDiv.append(html);
         }
@@ -440,6 +466,8 @@
                     "transformOrigin":"left top"});
                 }
 
+                result.find('[data-toggle="tooltip"]').tooltip();
+
                 var dlgDOM = $("#contact-info-dialog")[0];
                 if(dlgDOM.dinners) {
                     let congratulations = '恭喜你赢得了:';
@@ -459,7 +487,7 @@
             var hash = ids[pos];
             var dinner = dinners[hash];
             if (!!dinner) {
-                addDinner(result,dinner);
+                addDinner(result,dinner,pos+1);
                 getNextInfo(result,param,ids,pos);
                 return;
             }
@@ -477,7 +505,7 @@
                         bidder.nas = Unit.fromBasic(bidder.nasInWei,"nas");
                     }
                     dinners[dinner.hash] = dinner;
-                    addDinner(result,dinner);
+                    addDinner(result,dinner,pos+1);
                     getNextInfo(result,param,ids,pos);
                 }
                 else {

@@ -109,7 +109,7 @@ body {
 
 /* overrides - base.css */
 .logo-main .col:last-child .btn {
-    background-color: white;
+    background-color: #f6f3f2;
     color: #aaa;
     margin: 0 10px 0 0;
     padding: 0;
