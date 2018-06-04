@@ -261,7 +261,7 @@ var uiBlock = function () {
             // lang
 
             langList = i18n.supports();
-            lang = (localSave.getItem("lang") || "").toLowerCase();
+            lang = 'zh';//(localSave.getItem("lang") || "").toLowerCase();
             sLangButtons = "";
 
             for (i = 0, len = langList.length; i < len && langList[i] != lang; ++i);
@@ -286,11 +286,11 @@ var uiBlock = function () {
                     '            <div class="dropdown-menu api" aria-labelledby=logo-main-dropdown-1>' + sApiButtons +
                     "            </div>" +
                     "        </div>":"") +
-                    "        <div class=dropdown>" +
-                    '            <button class="btn dropdown-toggle" id=logo-main-dropdown-2 data-toggle=dropdown aria-haspopup=true aria-expanded=false data-i18n=name></button>' +
-                    '            <div class="dropdown-menu lang" aria-labelledby=logo-main-dropdown-2>' + sLangButtons +
-                    "            </div>" +
-                    "        </div>" +
+                    // "        <div class=dropdown>" +
+                    // '            <button class="btn dropdown-toggle" id=logo-main-dropdown-2 data-toggle=dropdown aria-haspopup=true aria-expanded=false data-i18n=name></button>' +
+                    // '            <div class="dropdown-menu lang" aria-labelledby=logo-main-dropdown-2>' + sLangButtons +
+                    // "            </div>" +
+                    // "        </div>" +
                     "    </div>" +
                     "</div>")
                 .on("click", ".api > button", onClickMenuApi)
