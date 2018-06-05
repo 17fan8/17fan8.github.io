@@ -62,7 +62,7 @@ var uiBlock = function () {
                 .addClass("container footer")
                 .html(
                     '<div class="text-center">' +
-                    "    <div>请联系我们</div>" +
+                    "    <div>联系我们</div>" +
                     "    <div>EMail:<a mailto=10678181@qq.com>10678181@qq.com</a></div>" +
                     "</div>" +
                     '<div class="copyright text-center">Copyright &copy; 2018 17fan8</div>'));
@@ -256,7 +256,7 @@ var uiBlock = function () {
             // lang
 
             langList = i18n.supports();
-            lang = 'zh';//(localSave.getItem("lang") || "").toLowerCase();
+            lang = (localSave.getItem("lang") || "").toLowerCase();
             sLangButtons = "";
 
             for (i = 0, len = langList.length; i < len && langList[i] != lang; ++i);
