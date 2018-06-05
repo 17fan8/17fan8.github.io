@@ -61,16 +61,11 @@ var uiBlock = function () {
             i18n.run($(selector)
                 .addClass("container footer")
                 .html(
-                    "<div class=logo></div>" +
-                    "<nav class=text-center>" +
-                    "    <a href=https://nebulas.io/ data-i18n=home></a>" +
-                    "    <a href=https://nebulas.io/technology.html data-i18n=technology></a>" +
-                    "    <a href=https://nebulas.io/community.html data-i18n=community></a>" +
-                    "    <a href=https://nebulas.io/team.html data-i18n=team></a>" +
-                    "    <a href=https://nebulas.io/resources.html data-i18n=resources></a>" +
-                    "    <a href=https://medium.com/nebulasio data-i18n=blog target=_blank></a>" +
-                    "</nav>" +
-                    '<div class="copyright text-center">Copyright &copy; 2018 Nebulas.io, 645 Howard Street, San Francisco</div>'));
+                    '<div class="text-center">' +
+                    "    <div>请联系我们</div>" +
+                    "    <div>EMail:<a mailto=10678181@qq.com>10678181@qq.com</a></div>" +
+                    "</div>" +
+                    '<div class="copyright text-center">Copyright &copy; 2018 17fan8</div>'));
         }
 
         function title(selector) {
@@ -78,7 +73,7 @@ var uiBlock = function () {
                 .addClass("title")
                 .html(
                     "<div>" +
-                    "    <h1> <span data-i18n=title> </h1>" +
+                    "    <h2> <span data-i18n=title> </h1>" +
                     "    <br>" +
                     "</div>" +
                     "<br>"));
@@ -226,7 +221,7 @@ var uiBlock = function () {
                     chainId: 1,
                     name: "Mainnet",
                     url: "https://mainnet.nebulas.io",
-                    contract:"",
+                    contract:"n1pRXS4KWY5bgEPHF2pkhpZmXcdGRQE6ofU",
                     explorer:"https://explorer.nebulas.io/#/",
                     callback:"https://pay.nebulas.io/api/mainnet/pay",
                 },
@@ -234,7 +229,7 @@ var uiBlock = function () {
                      chainId: 1001, 
                      name: "Testnet", 
                      url: "https://testnet.nebulas.io", 
-                     contract:"n1pRXS4KWY5bgEPHF2pkhpZmXcdGRQE6ofU",
+                     contract:"n21xEfC9E6bcd3ferShwTs49U1RaYN36sJf",
                      explorer:"https://explorer.nebulas.io/#/testnet/",
                      callback:"https://pay.nebulas.io/api/pay",
                 }

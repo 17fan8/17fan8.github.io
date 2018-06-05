@@ -81,23 +81,23 @@ Dinner.prototype = {
     },
     bid:function(hash,addr,user,nasInWei,time){
         if(!this.isActive()) {
-            return "not active";
+            throw new Error("not active");
         }
         var maxLimit = unit_nas.times(this.maxBidStep);
         var minLimit = unit_nas.times(this.minBidStep);
         var topBidder = this.getTopBidder();        
         if(!!topBidder) {
             if(nasInWei.lt(topBidder.nasInWei.plus(minLimit))) {
-                return "nas is too little";
+                throw new Error("nas is too less");
             }
             if(nasInWei.eq(topBidder.nasInWei)) {
                 if(time >= topBidder.time)
-                    return "time is too late";
+                throw new Error("time is too late");
             }
             maxLimit=topBidder.nasInWei.plus(maxLimit);
         }
         if(nasInWei.gt(maxLimit)) {
-            return "nas is too more";
+            throw new Error("nas is too more");
         }
 
         if(!!topBidder)
@@ -268,19 +268,17 @@ DinnerContract.prototype = {
     bid: function(hash,user) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         if(dinner.locked) {
-            return "is locked!";
+            throw new Error("is locked!");
         }
 
-        var result = dinner.bid(Blockchain.transaction.hash,
+        dinner.bid(Blockchain.transaction.hash,
             Blockchain.transaction.from,
             user,
             Blockchain.transaction.value,
             Blockchain.transaction.timestamp);
-        if(result!="ok")
-            return result;
         this.dinners.set(hash,dinner);
         return "ok";
     },
@@ -289,10 +287,10 @@ DinnerContract.prototype = {
     setSharePercent:function(hash, newPercent) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         if(dinner.ownerAddr !== from && from !== this._creator) {
-            return "not owner address!"
+            throw new Error("not owner address!")
         }
         dinner.sharePercent = newPercent;
         this.dinners.set(hash,dinner);
@@ -302,10 +300,10 @@ DinnerContract.prototype = {
     setBeginBlock:function(hash, beginBlock) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         if(dinner.ownerAddr !== from && from !== this._creator) {
-            return "not owner address!"
+            throw new Error("not owner address!");
         }
         dinner.beginBlock = beginBlock;
         this.dinners.set(hash,dinner);
@@ -315,10 +313,10 @@ DinnerContract.prototype = {
     setEndBlock:function(hash, endBlock) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         if(dinner.ownerAddr !== from && from !== this._creator) {
-            return "not owner address!"
+            throw new Error("not owner address!");
         }
         dinner.endBlock = endBlock;
         this.dinners.set(hash,dinner);
@@ -328,10 +326,10 @@ DinnerContract.prototype = {
     lock:function(hash,locked) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         if(dinner.ownerAddr !== from && from !== this._creator) {
-            return "not owner address!"
+            throw new Error("not owner address!");
         }
         dinner.locked = locked;
         this.dinners.set(hash,dinner);
@@ -340,11 +338,11 @@ DinnerContract.prototype = {
     setContactInfo:function(hash,contactInfo) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
         var topBidder = dinner.getTopBidder();
         if(dinner.ownerAddr !== from && from !== this._creator && from !== topBidder.addr) {
-            return "not owner address!"
+            throw new Error("not owner address!");
         }
         dinner.contactInfo = contactInfo;
         this.dinners.set(hash,dinner);
@@ -354,20 +352,20 @@ DinnerContract.prototype = {
     takeNasByOwner:function(hash) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
 
         if(dinner.isActive()) {
-            return "bid has not stopped!";
+            throw new Error("bid has not stopped!");
         }
 
         if(dinner.nasTook) {
-            return "the nas has be took."
+            throw new Error("the nas has be took.");
         }
 
         var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from) {
-            return "not owner address!"
+            throw new Error("not owner address!");
         }
 
         dinner.nasTook=true;
@@ -404,20 +402,20 @@ DinnerContract.prototype = {
     takeNasByBidder:function(hash) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
-            return "no dinner matched!";
+            throw new Error("no dinner matched!");
         }
 
         if(dinner.isActive()) {
-            return "bid has not stopped!";
+            throw new Error("bid has not stopped!");
         }
 
         if(dinner.locked) {
-            return "is locked!";
+            throw new Error("is locked!");
         }
 
         var bnPercent = new BigNumber(dinner.sharePercent);
         if(bnPercent.lte(0)){
-            return "no shared nas!";
+            throw new Error("no shared!");
         }
 
         var result = false;
@@ -461,7 +459,7 @@ DinnerContract.prototype = {
     takeNasByCreator:function(value) {
         var from = Blockchain.transaction.from;
         if(this._creator !== from) {
-            return "not creator address!"
+            throw new Error("not creator address!");
         }
 
         var value = new BigNumber(value);

@@ -83,7 +83,10 @@ span.ok{
 .cert-date{
   text-align: right;
 }
-
+.bid-state{
+  font-size: 0.8em;
+  text-align: center;
+}
 #ex1Slider .slider-selection {
 	background: #17a2b8;
 }

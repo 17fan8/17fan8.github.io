@@ -19,7 +19,7 @@
 </head>
 <body>
     <div class=logo-main></div>
-    <div class="title" style="text-align: center;"></div>
+    <div class="title" style="text-align: center;color:#6f3304;"></div>
     <div class="container">
         <div class="row">
             <div class="col">
@@ -41,7 +41,7 @@
     </div>
     <div id=result class="container" >
     </div>
-
+    <hr>
     <div class=footer></div>
 
     <!-- 竞投对话框 -->
@@ -69,15 +69,16 @@
                             </div>
                         </div>
                         <div class=row>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label for="dlg-number">出价：</label>
-                            </div>
-                            <div class="col-md-6" style="text-align: right;">
-                                <label id="dlg-bid-nas"></label>                                
+                                <label id="dlg-bid-nas" class=float-right></label>                                
                             </div>
                             <div class="w-100"></div>
                             <div class="col">
                                 <input id="dlg-number" style="width:100%;" data-slider-id="ex1Slider" type="text"/>
+                            </div>
+                            <div class="col-md-12">
+                                <span class="iconfont icon-xinxi" style="font-size:0.8em;">请确保支付的钱包地址与绑定地址一致！</span>
                             </div>
                         </div>
                     </div>
@@ -87,10 +88,10 @@
                 <div class="modal-footer form-group">
                     <div class="container" >
                         <div class=row>
-                            <div class="col-md-6">
+                            <div class="offset-md-2 col-md-4">
                                 <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
                             </div>
-                            <div class="col-md-6">
+                            <div class="offset-md-2 col-md-4">
                                 <button id="bid-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onBid()">确定</button>
                             </div>
                         </div>
@@ -293,8 +294,7 @@
         }
         
         var dinners={};
-        function addDinner(result,dinner,no) {
-            var isFirstItem = result.children(".dinner").length==0;
+        function updateDinner(result,dinner,show) {
             var progressValue =0;
             if(dinner.endBlock>dinner.beginBlock) {
                 progressValue= ((currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock)).toFixed(2);
@@ -322,6 +322,12 @@
             }
             var decimal = getValueDecimal(dinner.minBidStep);
             var sharePercent = parseFloat(dinner.sharePercent||"0");
+            
+            var dinnerDiv = result.children('#dinner-'+dinner.id);
+            if(dinnerDiv.length===0) {
+                result.append('<div id="dinner-'+dinner.id+'" class="dinner card'+'" data-hash="' + dinner.hash + '">' + '</div>');
+                dinnerDiv = result.children().last();
+            }
 
             const lockStr = dinner.locked?"(暂停)":"";
             const badges = '<span class="badge badge-info badge-pill" data-toggle="tooltip" title="本时间根据区块高度计算得到">预计</span>';
@@ -360,9 +366,12 @@
                 na=' na';
             }
 
+            if(na!=='')
+                dinnerDiv.addClass(na);
+
             var collapseState;
             var collapseShow;
-            if(isFirstItem) {
+            if(show) {
                 collapseState = '';
                 collapseShow = ' show';
             }
@@ -370,20 +379,17 @@
                 collapseState = ' collapsed';
                 collapseShow = '';
             }
-                
-            result.append('<div class="dinner card'+na+'" data-hash="' + dinner.hash + '">' + '</div>');
-            var dinnerDiv = result.children().last();
 
             var html =
-                '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+no+'" onclick="void(0)">' +
-                    '<span class="badge badge-pill badge-info'+na+'">第'+no+'期</span>' +
+                '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+dinner.id+'" onclick="void(0)">' +
+                    '<span class="badge badge-pill badge-info'+na+'">第'+(dinner.id+1)+'期</span>' +
                     '<h5><span class="float-right iconfont"></span>'  +
                     '<span style="margin-right:2em">'+dinner.title+'</span></h5>' +
                     '<div class="text-nowrap header-hash">' +
                         '<i style="font-size:0.8em">hash:"'+ dinner.hash +'"</i><br>' +
                     '</div>' +
                 '</div>' +
-                '<div id="dinner-body-'+no+'" class="card-body form-group collapse'+collapseShow+'" data-parent="#result">' +
+                '<div id="dinner-body-'+dinner.id+'" class="card-body form-group collapse'+collapseShow+'" data-parent="#result">' +
                 '<div class="form-group row">' +
                     '<div class="w-100"></div>' +
                     '<div class=col>' +
@@ -435,7 +441,7 @@
                     '</div>' +
                 '</div>' +
                 '</div>';
-            dinnerDiv.append(html);
+            dinnerDiv.html(html);
         }
 
         function queryBlockTime(result,spanClassName,height) {
@@ -487,7 +493,7 @@
             var hash = ids[pos];
             var dinner = dinners[hash];
             if (!!dinner) {
-                addDinner(result,dinner,pos+1);
+                updateDinner(result,dinner,pos==ids.length-1);
                 getNextInfo(result,param,ids,pos);
                 return;
             }
@@ -505,7 +511,8 @@
                         bidder.nas = Unit.fromBasic(bidder.nasInWei,"nas");
                     }
                     dinners[dinner.hash] = dinner;
-                    addDinner(result,dinner,pos+1);
+                    dinner.id=pos;
+                    updateDinner(result,dinner,pos==ids.length-1);
                     getNextInfo(result,param,ids,pos);
                 }
                 else {
@@ -562,11 +569,12 @@
         function onBid() {
             var hash, toAddress, email, amount, args;
             toAddress = localSave.getItem("contract");                
-            email = $("#dlg-email").val();
+            email = "";
             amount = $("#dlg-number").val();
             hash = $("#bid-dialog").attr("data-hash");
             args=[hash,email];
 
+            var dinner = dinners[hash];
             $("#bid-ok").attr("disabled", "disabled");
             try {
                 var serialNumber = nebPay.call(toAddress,amount,"bid",JSON.stringify(args),{
@@ -579,6 +587,19 @@
                     callback: localSave.getItem("callback"),
                     listener: listener  //set listener for extension transaction result
                 });
+
+                var bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                if(bidState.length>0) {
+                    bidState.html('正在等待支付...');
+                    bidState.removeClass("text-success");
+                    bidState.removeClass("text-danger");
+                    bidState.addClass("text-info");
+                }
+                else {
+                    $('#dinner-body-'+dinner.id).append('<div class="bid-state">正在等待打包...</div>');
+                    bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                    bidState.addClass("text-info");
+                }                             
 
                 $("#bid-ok").removeAttr("disabled");
                 $("#bid-dialog").modal('toggle');
@@ -603,12 +624,35 @@
                 }
                 nebPay.queryPayInfo(serialNumber,options)   //search transaction result from server (result upload to server by app)
                 .then(function (resp) {
-                    console.log("tx result: " + resp)   //resp is a JSON string
+                    console.log("sn:"+serialNumber+",tx result: " + resp)   //resp is a JSON string
                     var respObject = JSON.parse(resp)
-                    if(respObject.code === 0){
+                    if(respObject.code === 0 && respObject.data.status!=2){
                         clearInterval(intervalQuery);
+                        if(respObject.data.execute_error=="") {
+                            dinner.bidders.push({
+                                hash:respObject.data.hash,
+                                addr:respObject.data.from,
+                                nasInWei:Utils.toBigNumber(respObject.data.value),
+                                nas:Unit.fromBasic(respObject.data.value,"nas"),
+                                time:parseInt(respObject.data.timestamp),
+                                user:""
+                            });
+                            
+                            //刷新dinner
+                            var show = $('#dinner-body-'+dinner.id).hasClass("show");
+                            updateDinner($("#result"),dinner,show);
+
+                            $('#dinner-body-'+dinner.id).append('<div class="bid-state">竞价成功！</div>');
+                            bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                            bidState.removeClass("text-info");
+                            bidState.addClass("text-success");
+                        }
+                        else {
+                            bidState.html('竞价失败！（'+respObject.data.execute_error+'）');
+                            bidState.removeClass("text-info");
+                            bidState.addClass("text-danger");
+                        }
                     }
-                    //todo reflash dinner
                 })
                 .catch(function (err) {
                     console.log(err);
