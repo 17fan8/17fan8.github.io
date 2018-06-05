@@ -7,19 +7,19 @@ body {
 }
 
 a {
-    color: #000
+    color: #e06400
 }
 
 a:focus,
 a:visited {
-    color: #333;
+    color: #ed9c6d;
     text-decoration: none
 }
 
 a:active,
 a:hover {
     cursor: pointer;
-    color: #333;
+    color: #ed9c6d;
     text-decoration: none
 }
 

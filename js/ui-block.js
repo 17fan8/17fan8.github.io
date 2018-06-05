@@ -274,7 +274,7 @@ var uiBlock = function () {
                 .addClass("container logo-main")
                 .html(
                     "<div class=row>" +
-                    '    <div class=col></div>' +
+                    '    <div class=col><span class="iconfont icon-shiwu" style="font-size: 48px;color: #e06301;line-height: 1.2em;"></span></div>' +
                     "    <div class=col>" + (showMenu?
                     "        <div class=dropdown>" +
                     '            <button class="btn dropdown-toggle" id=logo-main-dropdown-1 data-toggle=dropdown aria-haspopup=true aria-expanded=false>' + sApiText + "</button>" +

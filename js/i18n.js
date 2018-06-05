@@ -137,7 +137,7 @@ var i18n = function () {
             rules:"Rules: Bidding during the event, each bid system will host the current bid deposit, and automatically return the deposit of the previous bidder. After the event is over, the highest bidder can get a chance to chat and chat with famous people. The deposit will be deducted by the system. For the operation and maintenance of the system; if the activity is set to be divided into proportions, all participants can receive activities divided into (amount received = maximum deposit * divided into proportions / number of bids)."
         },
         zh: {
-            title: "大佬约我来吃饭",
+            title: "一起饭吧！",
             subtitle: "基于星云链技术开发",
             amount: "金额",
             blog: "博客",

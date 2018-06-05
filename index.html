@@ -22,6 +22,10 @@
     <div class="title" style="text-align: center;color:#6f3304;"></div>
     <div class="container">
         <div class="row">
+            <div id=requires class="col-md-12">
+            </div>
+        </div>
+        <div class="row">
             <div class="col">
                 <div style="border:2px solid;border-radius: 4px;padding:1em;font-size: 2pm;">
                     <span data-i18n="rules"></span>
@@ -207,12 +211,14 @@
     <script src="libs/nebPay.js"></script>
     <script src="js/1-localSave.js"></script>
     <script src="js/home.v1.js"></script>
+    <script>
+        localSave.setItem("lang","zh");
+    </script>
     <script src="js/i18n.js" data-depends="jquery.slim"></script>
     <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
     <script>
         "use strict";
-        localSave.setItem("lang","zh");
-        
+
         var nebulas = require("nebulas"),
             Transaction = nebulas.Transaction,
             Utils = nebulas.Utils,
@@ -232,14 +238,14 @@
         });
 
         var lang = localSave.getItem("lang");
-        if((!os.isAndroid && !os.isPhone) && typeof (webExtensionWallet) === "undefined") {
-            bootbox.dialog({
-                backdrop: true,
-                onEscape: true,
-                message: lang=='zh'?"需要安装 extensionWallet 插件！":"Need install extensionWallet plugin!",
-                size: "large",
-                title: "Error"
-            });
+
+        if((!os.isAndroid && !os.isPhone)) {
+            if(typeof (webExtensionWallet) !== "undefined" ){
+                $("#requires").html('<span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://github.com/nebulasio/WebExtensionWallet">使用本网页需安装钱包插件，立即前往>></a></span>');
+            }
+        }
+        else {
+            $("#requires").html(' <span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://nano.nebulas.io/">使用本网页需安装星云钱包，立即前往>></a></span>');
         }
 
         neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
@@ -251,7 +257,7 @@
             $("#weixin-tip").modal("show");
         }
         else {
-            var bindAddr=localStorage.getItem("bindAddr");
+            var bindAddr=localSave.getItem("bindAddr");
             if(!bindAddr||bindAddr=="") {
                 $("#bind-addr-dialog").modal("show");
                 $("#bind-addr").text("未绑定");
@@ -336,7 +342,7 @@
             var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
             var na;
             if(dinner.beginBlock>currentBlock) {
-                stateText = '<h6 style="text-align:center;">未开始('+currentBlock+')</h6>';
+                stateText = '未开始';
                 progressClass='class="progress-bar progress-bar-striped bg-dinner"';
                 btnText = "我要竞价";
                 btnState = ' disabled=disabled';
@@ -346,7 +352,7 @@
                 na=' na';
             }
             else if(dinner.endBlock>currentBlock){
-                stateText = '<h6 style="text-align:center;">进行中('+currentBlock+')</h6>';
+                stateText = '进行中';
                 progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-dinner"';
                 btnText = "我要竞价";
                 btnState = dinner.locked?' disabled=disabled':'';
@@ -357,7 +363,7 @@
             }
             else {
                 var takeNas = getShareNas(dinner);
-                stateText = '<h6 style="text-align:center;">已完成('+currentBlock+')</h6>';
+                stateText = '已完成';
                 progressClass='class="progress-bar bg-dinner"';
                 btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
                     (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
@@ -384,7 +390,8 @@
 
             var html =
                 '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+dinner.id+'" onclick="void(0)">' +
-                    '<span class="badge badge-pill badge-info'+na+'">第'+(dinner.id+1)+'期</span>' +
+                    '<div><span class="badge badge-pill badge-info'+na+'">第'+(dinner.id+1)+'期</span>' +
+                    '<span class="badge badge-pill">（'+stateText+'）</span></div>' +
                     '<h5><span class="float-right iconfont"></span>'  +
                     '<span style="margin-right:2em">'+dinner.title+'</span></h5>' +
                     '<div class="text-nowrap header-hash">' +
@@ -400,7 +407,7 @@
                 '</div> <hr>'+
                 '<div class=row>' +
                     '<div class=col>' +
-                        stateText +
+                        '<h6 style="text-align:center;">'+stateText+'('+currentBlock+')</h6>' +
                         '<div class="progress">' +
                             '<div ' + progressClass + ' role="progressbar" ' +
                                 'value='+currentBlock+' min=' + dinner.beginBlock + 
@@ -447,13 +454,13 @@
         }
 
         function queryBlockTime(result,spanClassName,height) {
-            var timestamp = localStorage.getItem("blockTime."+height);
+            var timestamp = localSave.getItem("blockTime."+height);
             if(timestamp) {
                 return formatTime(parseInt(timestamp)*1000);
             }
             
             neb.api.getBlockByHeight({height:height,fullTransaction:false}).then(function(block) {
-                localStorage.setItem("blockTime."+height,block.timestamp);
+                localSave.setItem("blockTime."+height,block.timestamp);
                 result.find(spanClassName).text(formatTime(block.timestamp*1000));
             });
             return "";
@@ -769,7 +776,7 @@
             var validateAll = uiBlock.validate("#bind-addr-dialog");
             if (validateAll()) {
                 bindAddr = $("#bind-addr-dialog .icon-address input").val();
-                localStorage.setItem("bindAddr",bindAddr);
+                localSave.setItem("bindAddr",bindAddr);
                 $("#bind-addr").text(bindAddr);
                 $("#bind-addr-box").removeClass("alert-warning");
                 $("#bind-addr-box").addClass("alert-success");
@@ -778,7 +785,7 @@
         }
         function onClearBindAddr() {
             bindAddr="";
-            localStorage.setItem("bindAddr",bindAddr);
+            localSave.setItem("bindAddr",bindAddr);
             $("#bind-addr").text(bindAddr);
             $("#bind-addr-box").removeClass("alert-success");
             $("#bind-addr-box").addClass("alert-warning");
