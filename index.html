@@ -211,6 +211,8 @@
     <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
     <script>
         "use strict";
+        localSave.setItem("lang","zh");
+        
         var nebulas = require("nebulas"),
             Transaction = nebulas.Transaction,
             Utils = nebulas.Utils,

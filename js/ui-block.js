@@ -274,7 +274,7 @@ var uiBlock = function () {
                 .addClass("container logo-main")
                 .html(
                     "<div class=row>" +
-                    '    <div class=col><img style="width: 64px;" src="images/food.png"></div>' +
+                    '    <div class=col></div>' +
                     "    <div class=col>" + (showMenu?
                     "        <div class=dropdown>" +
                     '            <button class="btn dropdown-toggle" id=logo-main-dropdown-1 data-toggle=dropdown aria-haspopup=true aria-expanded=false>' + sApiText + "</button>" +
