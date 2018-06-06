@@ -15,6 +15,25 @@
      .tooltip-inner > p {
         text-align:left;
     }
+    .table th, .table td {
+        padding:0.5em;
+        text-align: center;
+    }
+    .bid-list {
+        box-shadow:0 0 1.6em 0.2em gray inset;
+    }
+    a[disabled] {
+        color:lightgrey !important;
+    }
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #e06400;
+        border-color: #e06400;
+    }
+    .page-link{
+        color: #e06400;        
+    }
  </style>
 </head>
 <body>
@@ -300,6 +319,52 @@
             }
             return {sharedNas:sharedNas,tookNas:tookNas};
         }
+
+        function onPageTo(obj,page) {
+            var dinnerDiv = $(obj).closest(".dinner");
+            var hash = dinnerDiv.attr("data-hash");
+            var dinner = dinners[hash];
+            dinnerDiv.find('#bid-list-'+dinner.id).html(setPage(dinner.bidders,page));
+        }
+
+        function onPagePrev(obj) {
+            var pagination = $(obj).closest(".pagination");
+            var page = parseInt(pagination.attr('page')-1);
+            onPageTo(obj,page);
+        }
+
+        function onPageNext(obj) {
+            var pagination = $(obj).closest(".pagination");
+            var page = parseInt(pagination.attr('page')+1);
+            onPageTo(obj,page);
+        }
+
+        function setPage(bidders, page) {
+            var html = '<table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>no</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
+            var from = bidders.length-1-page*10;
+            var to = from-10;
+            if(to<0)
+                to=0;
+            for(let i=from;i>=to;--i) {
+                html+='<tr>' +
+                '<td>'+ (bidders.length-i) +'</td>' +
+                '<td><div class="text-nowrap">'+ bidders[i].addr+'</div></td>' +
+                '<td>'+ bidders[i].nas+'</td>' +
+                '</tr>';
+            }
+            html+="</tbody></table>";
+            var pages = parseInt((bidders.length+9)/10);
+            if(bidders.length>10) {
+                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;" page='+page+'>' +
+                    '<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:" '+(page==0?'disabled=disabled':'onclick="onPagePrev(this)"')+'>前一页</a></li>';
+                for(let p=0;p<pages;++p) {
+                    html +='<li class="page-item'+(page==p?' active':'')+'"><a class="page-link" href="javascript:" onclick="onPageTo(this,'+p+')">'+(p+1)+'</a></li>';
+                }
+                html +='<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:"'+(page==pages-1?'disabled=disabled':'onclick="onPageNext(this)"')+'>后一页</a></li>' +
+                '</ul>';
+            }
+            return html;
+        }
         
         var dinners={};
         function updateDinner(result,dinner,show) {
@@ -312,8 +377,9 @@
                     progressValue=100;
             }
             var topBidNas = Utils.toBigNumber(0), topBidderAddr="空缺";
-            if(dinner.bidders.length>0) {
-                var topBidder = dinner.bidders[dinner.bidders.length-1];
+            var bidders = dinner.bidders;
+            if(bidders.length>0) {
+                var topBidder = bidders[bidders.length-1];
                 topBidNas = topBidder.nas;
                 topBidderAddr = topBidder.addr;
 
@@ -388,6 +454,8 @@
                 collapseShow = '';
             }
 
+            var bidList = setPage(bidders,0);
+
             var html =
                 '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+dinner.id+'" onclick="void(0)">' +
                     '<div><span class="badge badge-pill badge-info'+na+'">第'+(dinner.id+1)+'期</span>' +
@@ -438,10 +506,14 @@
                     '</div>' +
                     '<div class="col-md-6">' + 
                         '竞价次数：'+ dinner.bidders.length + '次' +
+                        '<a href="#bid-list-'+dinner.id+'" data-toggle="collapse" style="float:right;font-size:0.8em;"> 详情...</a>' +
                     '</div>' +
                     '<div class=col-md-6>' +
                         '<a data-toggle="tooltip" data-html=true title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：'+ (dinner.sharePercent||0)+' % <span class="iconfont icon-xinxi"></span></a>' +
                     '</div>' +
+                '</div>' +
+                '<div id=bid-list-'+dinner.id+' class="row bid-list collapse">'+
+                    bidList +
                 '</div>' +
                 '<hr>' +
                 '<div class="row form-group">'+
