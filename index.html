@@ -8,6 +8,12 @@
     <link href="stylesheets/style.css" rel="stylesheet">
     <link href="stylesheets/ui-block.css" rel="stylesheet">
     <link href="stylesheets/base.css" rel="stylesheet">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/touch-icon-iphone.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="images/touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="images/touch-icon-iphone4.png" />
+
+    <link rel="stylesheet" type="text/css" href="libs/addtohomescreen/style/addtohomescreen.css">
     <title>和大佬吃饭吧！</title>
     <meta name=viewport content="width=device-width">
     <meta charset="utf-8">
@@ -225,6 +231,7 @@
     <script src="libs/external/jquery.md5.js"></script>
     <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
     <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/addtohomescreen/src/addtohomescreen.js"></script>
     <script src="libs/blockies.min.js"></script>
     <script src="dist/nebulas.js"></script>
     <script src="libs/nebPay.js"></script>
@@ -237,6 +244,10 @@
     <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
     <script>
         "use strict";
+        addToHomescreen({
+            //startDelay: 5, //开始的间隔
+            //maxDisplayCount: 1 //最多出现次数
+        });
 
         var nebulas = require("nebulas"),
             Transaction = nebulas.Transaction,
@@ -340,7 +351,7 @@
         }
 
         function setPage(bidders, page) {
-            var html = '<table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>no</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
+            var html = '<table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>No</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
             var from = bidders.length-1-page*10;
             var to = from-10;
             if(to<0)
