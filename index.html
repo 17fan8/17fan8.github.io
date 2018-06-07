@@ -8,7 +8,7 @@
     <link href="stylesheets/style.css" rel="stylesheet">
     <link href="stylesheets/ui-block.css" rel="stylesheet">
     <link href="stylesheets/base.css" rel="stylesheet">
-    <title>一起饭吧！</title>
+    <title>和大佬吃饭吧！</title>
     <meta name=viewport content="width=device-width">
     <meta charset="utf-8">
     <style>
@@ -348,7 +348,7 @@
             for(let i=from;i>=to;--i) {
                 html+='<tr>' +
                 '<td>'+ (bidders.length-i) +'</td>' +
-                '<td><div class="text-nowrap">'+ bidders[i].addr+'</div></td>' +
+                '<td><div class="text-nowrap'+(bidders[i].addr===bindAddr?' alert-success':'') +'">'+ bidders[i].addr+'</div></td>' +
                 '<td>'+ bidders[i].nas+'</td>' +
                 '</tr>';
             }
@@ -418,7 +418,7 @@
                 na=' na';
             }
             else if(dinner.endBlock>currentBlock){
-                stateText = '进行中';
+                stateText = '竞拍中';
                 progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-dinner"';
                 btnText = "我要竞价";
                 btnState = dinner.locked?' disabled=disabled':'';
@@ -475,7 +475,7 @@
                 '</div> <hr>'+
                 '<div class=row>' +
                     '<div class=col>' +
-                        '<h6 style="text-align:center;">'+stateText+'('+currentBlock+')</h6>' +
+                        '<h6 style="text-align:center;">'+stateText+'(当前区块高度：'+currentBlock+')</h6>' +
                         '<div class="progress">' +
                             '<div ' + progressClass + ' role="progressbar" ' +
                                 'value='+currentBlock+' min=' + dinner.beginBlock + 
@@ -487,8 +487,8 @@
                 '</div>' +
                 '<div class="row">' +
                     '<div class="col-md-12">' +
-                        '<span style="float:left;">' + dinner.beginBlock+'</span>' +
-                        '<span style="float:right;">' + dinner.endBlock+'</span>' +
+                        '<span style="float:left;" data-toggle="tooltip" title="开始区块高度">' + dinner.beginBlock+'</span>' +
+                        '<span style="float:right;" data-toggle="tooltip" title="结束区块高度">' + dinner.endBlock+'</span>' +
                     '</div>' +
                 '</div> <hr>' +
                 '<div class="row">' +
@@ -502,7 +502,7 @@
                         '最高竞价：'+ topBidNas.toFixed(decimal) + ' NAS' +
                     '</div>' +
                     '<div class="col-md-6 text-nowrap">' + 
-                        '最高竞家：' + topBidderAddr +
+                        '最高竞家：<span style="'+(topBidderAddr===bindAddr&&bindAddr!=""?'color:#155724;':'color:#721c24;') +'"border-radius:5px;">'+ topBidderAddr + '</span>' +
                     '</div>' +
                     '<div class="col-md-6">' + 
                         '竞价次数：'+ dinner.bidders.length + '次' +

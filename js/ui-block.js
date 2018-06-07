@@ -72,11 +72,11 @@ var uiBlock = function () {
             i18n.run($(selector)
                 .addClass("title")
                 .html(
-                    "<div>" +
-                    "    <h2> <span data-i18n=title> </h1>" +
-                    "    <br>" +
-                    "</div>" +
-                    "<br>"));
+                    '<div>' +
+                    '    <h2> <span data-i18n=title> </h1>' +
+                    '    <h6 style="color:#b39a87"> <span data-i18n=subtitle> </h6>' +
+                    '</div>' +
+                    '<br>'));
         }
 
         function header(selector) {

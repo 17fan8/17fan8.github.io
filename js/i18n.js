@@ -137,8 +137,8 @@ var i18n = function () {
             rules:"Rules: Bidding during the event, each bid system will host the current bid deposit, and automatically return the deposit of the previous bidder. After the event is over, the highest bidder can get a chance to chat and chat with famous people. The deposit will be deducted by the system. For the operation and maintenance of the system; if the activity is set to be divided into proportions, all participants can receive activities divided into (amount received = maximum deposit * divided into proportions / number of bids)."
         },
         zh: {
-            title: "一起饭吧！",
-            subtitle: "基于星云链技术开发",
+            title: "和大佬吃饭吧！",
+            subtitle: "一次与大佬亲密接触的机会，参与还能分NAS",
             amount: "金额",
             blog: "博客",
             "check/anchor": "有关此工具请阅读这里。",
@@ -258,7 +258,7 @@ var i18n = function () {
             "transfer/from-address": "颁发者地址",
             "transfer/owner-address": "获奖者地址",
             "transfer/code": "认证代码",
-            rules:"活动规则：在活动期间进行竞价，每次出价后系统会托管当前的竞价押金，并且自动退还前一出价人的押金，活动结束后出价最高者可赢得和饭主一起吃饭聊天的机会，押金将被系统扣除用作系统的运维，同时根据分成比例奖励给活动的所有参与者（参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数）。"
+            rules:"活动规则：在活动期间进行竞价，每次出价后系统会托管当前的竞价押金，并且自动退还前一出价人的押金，活动结束后出价最高者可赢得和大佬一起吃饭聊天的机会，押金将被系统扣除用作系统的运维，同时根据分成比例奖励给活动的所有参与者（参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数）。"
         }
     };
 
