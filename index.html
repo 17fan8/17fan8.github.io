@@ -246,7 +246,8 @@
         "use strict";
         addToHomescreen({
             //startDelay: 5, //开始的间隔
-            //maxDisplayCount: 1 //最多出现次数
+            skipFirstVisit: true, //首次跳过出现
+            maxDisplayCount: 1 //最多出现次数
         });
 
         var nebulas = require("nebulas"),
@@ -268,6 +269,10 @@
         });
 
         var lang = localSave.getItem("lang");
+        var contractAddr = localSave.getItem("contract");
+        var issuerAddr= localSave.getItem("issuer");
+        
+        
 
         if((!os.isAndroid && !os.isPhone)) {
             if(typeof (webExtensionWallet) !== "undefined" ){
@@ -302,7 +307,14 @@
         var currentBlock = 0;
         neb.api.getNebState().then(function(state) {
             currentBlock = parseInt(state.height);
-            listByIssuer("n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8");
+            listByIssuer(issuerAddr);
+
+            //自动刷新当前区块高度
+            setInterval(function(){
+                neb.api.getNebState().then(function(state) {
+                    currentBlock = parseInt(state.height);
+                });
+            },1500);
         });
 
         //计算可领取的NAS
@@ -378,7 +390,21 @@
         }
         
         var dinners={};
-        function updateDinner(result,dinner,show) {
+        function parseDinner(tx) {
+            var dinner = JSON.parse(tx.result);
+            if(!!dinner && !!dinner.hash) {
+                var bidders = dinner.bidders;
+                dinner.minBidStep=dinner.minBidStep||0.1;
+                dinner.maxBidStep=dinner.maxBidStep||5;
+                for(var i=0;i<bidders.length;++i) {
+                    var bidder = bidders[i];
+                    bidder.nasInWei = Utils.toBigNumber(bidder.nasInWei);
+                    bidder.nas = Unit.fromBasic(bidder.nasInWei,"nas");
+                }
+            }
+            return dinner;
+        }
+        function updateDinner(result,dinner,show,showBidList=false,page=0,bidStateDom=null) {
             var progressValue =0;
             if(dinner.endBlock>dinner.beginBlock) {
                 progressValue= ((currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock)).toFixed(2);
@@ -437,6 +463,33 @@
                 startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
                 endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
                 na='';
+
+                var reflashDinner=setInterval(function(){
+                    clearInterval(reflashDinner);
+                    var param = 
+                    {
+                        from: issuerAddr,
+                        to: contractAddr,
+                        value: Unit.nasToBasic(Utils.toBigNumber("0")),
+                        nonce: 0,
+                        gasPrice: 1000000,
+                        gasLimit: 200000,
+                        contract: {"function":"info","args":JSON.stringify([dinner.hash])}
+                    };
+                    neb.api.call(param)
+                    .then(function(tx) {
+                        let newDinner = parseDinner(tx);
+                        newDinner.id=dinner.id;
+                        //if(JSON.stringify(newDinner)!==JSON.stringify(dinner)) {使用本判断会使进度不刷新
+                            dinners[newDinner.hash] = newDinner;
+                            let show = $('#dinner-body-'+dinner.id).hasClass("show");
+                            let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
+                            let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
+                            let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
+                            updateDinner($("#result"),dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                        //}
+                    });
+                },15000);
             }
             else {
                 var takeNas = getShareNas(dinner);
@@ -465,7 +518,7 @@
                 collapseShow = '';
             }
 
-            var bidList = setPage(bidders,0);
+            var bidList = setPage(bidders,page);
 
             var html =
                 '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+dinner.id+'" onclick="void(0)">' +
@@ -523,7 +576,7 @@
                         '<a data-toggle="tooltip" data-html=true title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：'+ (dinner.sharePercent||0)+' % <span class="iconfont icon-xinxi"></span></a>' +
                     '</div>' +
                 '</div>' +
-                '<div id=bid-list-'+dinner.id+' class="row bid-list collapse">'+
+                '<div id=bid-list-'+dinner.id+' class="row bid-list collapse'+(showBidList?' show':'')+'">'+
                     bidList +
                 '</div>' +
                 '<hr>' +
@@ -531,7 +584,7 @@
                     '<div class=col>' +
                         '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
                     '</div>' +
-                '</div>' +
+                '</div>'+(bidStateDom?bidStateDom.outerHTML:'') +
                 '</div>';
             dinnerDiv.html(html);
         }
@@ -592,16 +645,8 @@
             param.contract={"function":"info","args":JSON.stringify([hash])};
             neb.api.call(param)
             .then(function(tx) {
-                dinner = JSON.parse(tx.result);
+                dinner = parseDinner(tx);
                 if(!!dinner && !!dinner.hash) {
-                    var bidders = dinner.bidders;
-                    dinner.minBidStep=dinner.minBidStep||0.1;
-                    dinner.maxBidStep=dinner.maxBidStep||5;
-                    for(var i=0;i<bidders.length;++i) {
-                        var bidder = bidders[i];
-                        bidder.nasInWei = Utils.toBigNumber(bidder.nasInWei);
-                        bidder.nas = Unit.fromBasic(bidder.nasInWei,"nas");
-                    }
                     dinners[dinner.hash] = dinner;
                     dinner.id=pos;
                     updateDinner(result,dinner,pos==ids.length-1);
@@ -613,15 +658,15 @@
             });
         }
 
-        function listByIssuer(isseuerAddr) {
+        function listByIssuer(issuer) {
             var toAddress, contract;
-            toAddress = localSave.getItem("contract");;
-            contract={"function":"listByIssuer","args":JSON.stringify([isseuerAddr])}
+            toAddress = localSave.getItem("contract");
+            contract={"function":"listByIssuer","args":JSON.stringify([issuer])}
         
             try {
                 var temp = 
                 {
-                    from: isseuerAddr,
+                    from: issuer,
                     to: toAddress,
                     value: Unit.nasToBasic(Utils.toBigNumber("0")),
                     nonce: 0,
@@ -666,6 +711,7 @@
             hash = $("#bid-dialog").attr("data-hash");
             args=[hash,email];
 
+            var intervalWaitPay;
             var dinner = dinners[hash];
             $("#bid-ok").attr("disabled", "disabled");
             try {
@@ -680,18 +726,24 @@
                     listener: listener  //set listener for extension transaction result
                 });
 
-                var bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                let bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
                 if(bidState.length>0) {
-                    bidState.html('正在等待支付...');
+                    bidState.html('正在等待支付...(<span>0秒</span>)');
                     bidState.removeClass("text-success");
                     bidState.removeClass("text-danger");
                     bidState.addClass("text-info");
                 }
                 else {
-                    $('#dinner-body-'+dinner.id).append('<div class="bid-state">正在等待打包...</div>');
+                    $('#dinner-body-'+dinner.id).append('<div class="bid-state">正在等待支付...(<span>0秒</span>)</div>');
                     bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
                     bidState.addClass("text-info");
-                }                             
+                }
+                
+                var secForWait = 0;
+                var intervalWaitPay = setInterval(function(){
+                    ++secForWait;
+                    $('#dinner-body-'+dinner.id + ' > .bid-state > span').text(secForWait+"秒");
+                    },1000);
 
                 $("#bid-ok").removeAttr("disabled");
                 $("#bid-dialog").modal('toggle');
@@ -720,6 +772,7 @@
                     var respObject = JSON.parse(resp)
                     if(respObject.code === 0 && respObject.data.status!=2){
                         clearInterval(intervalQuery);
+                        clearInterval(intervalWaitPay);
                         if(respObject.data.execute_error=="") {
                             dinner.bidders.push({
                                 hash:respObject.data.hash,
@@ -731,8 +784,11 @@
                             });
                             
                             //刷新dinner
-                            var show = $('#dinner-body-'+dinner.id).hasClass("show");
-                            updateDinner($("#result"),dinner,show);
+                            let show = $('#dinner-body-'+dinner.id).hasClass("show");
+                            let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
+                            let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
+                            let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
+                            updateDinner($("#result"),dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
 
                             $('#dinner-body-'+dinner.id).append('<div class="bid-state">竞价成功！</div>');
                             bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');

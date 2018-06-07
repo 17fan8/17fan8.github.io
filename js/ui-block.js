@@ -222,16 +222,18 @@ var uiBlock = function () {
                     name: "Mainnet",
                     url: "https://mainnet.nebulas.io",
                     contract:"n1pRXS4KWY5bgEPHF2pkhpZmXcdGRQE6ofU",
+                    issuer:"",
                     explorer:"https://explorer.nebulas.io/#/",
                     callback:"https://pay.nebulas.io/api/mainnet/pay",
                 },
                 {
-                     chainId: 1001, 
-                     name: "Testnet", 
-                     url: "https://testnet.nebulas.io", 
-                     contract:"n21xEfC9E6bcd3ferShwTs49U1RaYN36sJf",
-                     explorer:"https://explorer.nebulas.io/#/testnet/",
-                     callback:"https://pay.nebulas.io/api/pay",
+                    chainId: 1001, 
+                    name: "Testnet", 
+                    url: "https://testnet.nebulas.io", 
+                    contract:"n21xEfC9E6bcd3ferShwTs49U1RaYN36sJf",
+                    issuer:"n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8",
+                    explorer:"https://explorer.nebulas.io/#/testnet/",
+                    callback:"https://pay.nebulas.io/api/pay",
                 }
             ];
             apiPrefix = (localSave.getItem("apiPrefix") || "").toLowerCase();
@@ -243,6 +245,7 @@ var uiBlock = function () {
             localSave.setItem("apiPrefix", apiPrefix = apiList[i].url);
             localSave.setItem("chainId", apiList[i].chainId);
             localSave.setItem("contract", apiList[i].contract);
+            localSave.setItem("issuer", apiList[i].issuer);
             localSave.setItem("explorer", apiList[i].explorer);
             localSave.setItem("callback", apiList[i].callback);
             sApiText = apiList[i].name;
