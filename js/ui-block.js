@@ -221,7 +221,7 @@ var uiBlock = function () {
                     chainId: 1,
                     name: "Mainnet",
                     url: "https://mainnet.nebulas.io",
-                    contract:"n1pWbhK9uQJpCHR1BkjcmC359J7qWeKRLxe",
+                    contract:"n1yWXY9QX7A3W2cEuFuHnvqT5uKCvqG6Yab",
                     issuer:"n1aJRdzKapRuxV21YKmjLEXng4e9AJz1DLN",
                     explorer:"https://explorer.nebulas.io/#/",
                     callback:"https://pay.nebulas.io/api/mainnet/pay",
