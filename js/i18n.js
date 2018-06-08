@@ -145,7 +145,7 @@ var i18n = function () {
         },
         zh: {
             title: "和大佬吃饭吧！",
-            subtitle: "一次与大佬近距离交流的机会，参与还能分NAS",
+            subtitle: "一次与大佬近距交流的机会，参与还能分NAS",
             amount: "金额",
             blog: "博客",
             "check/anchor": "有关此工具请阅读这里。",
