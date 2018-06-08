@@ -447,7 +447,7 @@
             if(dinner.beginBlock>currentBlock) {
                 stateText = '未开始';
                 progressClass='class="progress-bar progress-bar-striped bg-dinner"';
-                btnText = "我要竞价";
+                btnText = "我要竞价"+lockStr;
                 btnState = ' disabled=disabled';
                 btnClick = '';
                 startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges
@@ -457,7 +457,7 @@
             else if(dinner.endBlock>currentBlock){
                 stateText = '竞拍中';
                 progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-dinner"';
-                btnText = "我要竞价";
+                btnText = "我要竞价"+lockStr;
                 btnState = dinner.locked?' disabled=disabled':'';
                 btnClick = ' onclick="showBidDialog(this)"';
                 startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
@@ -498,6 +498,7 @@
                 progressClass='class="progress-bar bg-dinner"';
                 btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
                     (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
+                btnText = btnText + lockStr;
                 btnState = (takeNas.sharedNas.eq(0)||dinner.locked)?' disabled=disabled':'';
                 btnClick = ' onclick="onTakeNas(this)"';
                 startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
