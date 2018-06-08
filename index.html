@@ -219,7 +219,7 @@
             <div class="modal-content">
                 <div style="text-align:center; padding:1em;">
                     <div style="color: saddlebrown;margin:2em 0;" >请点击右上角的“...”，选择在浏览器打开</div>
-                    <img style="border-radius:0.5em;width: 100%;border: 2px solid;" src="images/weixin-tip.jpeg" >
+                    <img style="border-radius:0.5em;width: 100%;border: 2px solid;" src="images/weixin-tip.png" >
                 </div>
             </div>
         </div>
@@ -486,7 +486,7 @@
                             let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
                             let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
                             let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
-                            updateDinner($("#result"),dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                            updateDinner(result,dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
                         //}
                     });
                 },15000);
@@ -587,6 +587,7 @@
                 '</div>'+(bidStateDom?bidStateDom.outerHTML:'') +
                 '</div>';
             dinnerDiv.html(html);
+            dinnerDiv.find('[data-toggle="tooltip"]').tooltip();
         }
 
         function queryBlockTime(result,spanClassName,height) {
@@ -616,8 +617,6 @@
                     result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
                     "transformOrigin":"left top"});
                 }
-
-                result.find('[data-toggle="tooltip"]').tooltip();
 
                 var dlgDOM = $("#contact-info-dialog")[0];
                 if(dlgDOM.dinners) {
