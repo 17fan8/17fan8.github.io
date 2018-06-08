@@ -67,7 +67,7 @@ var Dinner = function(obj) {
         this.endBlock = obj.endBlock;       //结束报名区块号
         this.nasTook = obj.nasTook;                 //nas是否已经领取
         this.locked = obj.locked;                   //是否锁定，锁定后不能竞价，不能领取奖励
-        this.contacted = obj.contacted;             //是否联系上竞家
+        this.contactInfo = obj.contactInfo;         //竞家联系方式
         this.bidders = obj.bidders||[];             //竞投的历史记录
         this.minBidStep = obj.minBidStep||"0.1";    //竞价起跳最多NAS数
         this.maxBidStep = obj.maxBidStep||"5";      //竞价起跳最多NAS数
@@ -283,12 +283,41 @@ DinnerContract.prototype = {
         return "ok";
     },
 
+    //设置活动内容
+    setText:function(hash, newText) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            throw new Error("no dinner matched!");
+        }
+        var from = Blockchain.transaction.from;
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            throw new Error("not owner address!")
+        }
+        dinner.text = newText;
+        this.dinners.set(hash,dinner);
+    },
+
+    //设置活动主题
+    setTitle:function(hash, newTitle) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            throw new Error("no dinner matched!");
+        }
+        var from = Blockchain.transaction.from;
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            throw new Error("not owner address!")
+        }
+        dinner.title = newTitle;
+        this.dinners.set(hash,dinner);
+    },
+
     //设置领取比例
     setSharePercent:function(hash, newPercent) {
         var dinner = this.dinners.get(hash);
         if(!dinner) {
             throw new Error("no dinner matched!");
         }
+        var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from && from !== this._creator) {
             throw new Error("not owner address!")
         }
@@ -302,6 +331,7 @@ DinnerContract.prototype = {
         if(!dinner) {
             throw new Error("no dinner matched!");
         }
+        var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from && from !== this._creator) {
             throw new Error("not owner address!");
         }
@@ -315,6 +345,7 @@ DinnerContract.prototype = {
         if(!dinner) {
             throw new Error("no dinner matched!");
         }
+        var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from && from !== this._creator) {
             throw new Error("not owner address!");
         }
@@ -328,6 +359,7 @@ DinnerContract.prototype = {
         if(!dinner) {
             throw new Error("no dinner matched!");
         }
+        var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from && from !== this._creator) {
             throw new Error("not owner address!");
         }
@@ -341,6 +373,7 @@ DinnerContract.prototype = {
             throw new Error("no dinner matched!");
         }
         var topBidder = dinner.getTopBidder();
+        var from = Blockchain.transaction.from;
         if(dinner.ownerAddr !== from && from !== this._creator && from !== topBidder.addr) {
             throw new Error("not owner address!");
         }
