@@ -257,14 +257,14 @@
             neb = new nebulas.Neb(),
             validateAll = uiBlock.validate();
 
-        var queryNet = getQueryVariable("net");
+        var queryNet = getQueryVariable("net")||"mainnet";
 
         uiBlock.insert({
             footer: ".footer",
             title: ".title",
             header: ".header",
             iconAddress: ".icon-address",
-            logoMain: [".logo-main", queryNet, queryNet==null],
+            logoMain: [".logo-main", queryNet, false],
             numberComma: ".number-comma",
         });
 
