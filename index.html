@@ -887,13 +887,16 @@
                 if(dlgNumber[0].slide)
                     dlgNumber.slider('destroy');
 
-                $("#dlg-bid-nas").text(topBidNas.plus(1).toFixed(decimal) +" NAS");
-                dlgNumber.val(topBidNas.toFixed(decimal));
+                let minStep1 = Utils.toBigNumber(dinner.minBidStep);
+                let minStep2 = Utils.toBigNumber(dinner.maxBidStep).div(10);
+                let defaultNas = topBidNas.plus(minStep2.lt(minStep1)?minStep1:minStep2);
+                $("#dlg-bid-nas").text(defaultNas.toFixed(decimal) +" NAS");
+                dlgNumber.val(defaultNas.toFixed(decimal));
                 dlgNumber.attr({
                     "data-slider-step":dinner.minBidStep,
                     "data-slider-min":topBidNas.plus(dinner.minBidStep),
                     "data-slider-max":topBidNas.plus(dinner.maxBidStep),
-                    "data-slider-value":topBidNas.plus(dinner.minBidStep.plus(dinner.maxBidStep.div(10)))
+                    "data-slider-value":defaultNas
                 });
                 $("#bid-dialog").attr("data-hash",hash);
                 $("#bid-dialog").modal('show');
