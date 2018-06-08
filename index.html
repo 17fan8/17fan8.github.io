@@ -582,7 +582,7 @@
                 '<hr>' +
                 '<div class="row form-group">'+
                     '<div class=col>' +
-                        '<button class="btn btn-block" '+btnState+btnClick+'">'+btnText+'</button>' +
+                        '<button class="btn btn-block" '+btnState+btnClick+'>'+btnText+'</button>' +
                     '</div>' +
                 '</div>'+(bidStateDom?bidStateDom.outerHTML:'') +
                 '</div>';
@@ -786,8 +786,7 @@
                             let show = $('#dinner-body-'+dinner.id).hasClass("show");
                             let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
                             let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
-                            let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
-                            updateDinner($("#result"),dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                            updateDinner($("#result"),dinner,show,showBidList,page);
 
                             $('#dinner-body-'+dinner.id).append('<div class="bid-state">竞价成功！</div>');
                             bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
@@ -893,7 +892,7 @@
                     "data-slider-step":dinner.minBidStep,
                     "data-slider-min":topBidNas.plus(dinner.minBidStep),
                     "data-slider-max":topBidNas.plus(dinner.maxBidStep),
-                    "data-slider-value":topBidNas.plus(1)
+                    "data-slider-value":topBidNas.plus(dinner.minBidStep.plus(dinner.maxBidStep.div(10)))
                 });
                 $("#bid-dialog").attr("data-hash",hash);
                 $("#bid-dialog").modal('show');

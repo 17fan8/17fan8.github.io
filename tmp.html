@@ -3,33 +3,67 @@
 
 <head>
     <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="fonts/iconfont.css" rel="stylesheet">
     <link href="stylesheets/style.css" rel="stylesheet">
     <link href="stylesheets/ui-block.css" rel="stylesheet">
     <link href="stylesheets/base.css" rel="stylesheet">
-    <title>一起饭吧！</title>
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <title>和大佬一起吃饭吧！</title>
     <meta name=viewport content="width=device-width">
     <meta charset="utf-8">
 </head>
 <body>
-    <div class=logo-main></div>
-    <div class="title" style="text-align: center;"></div>
-    <div class="header"></div>
+    <div class="logo-main container"><div class="row">    <div class="col"><span class="iconfont icon-shiwu" style="font-size: 48px;color: #e06301;line-height: 1.2em;"></span></div>    <div class="col">    </div></div></div>
+    <div class="title" style="text-align: center;color:#6f3304;"><div>    <h2> <span data-i18n="title">和大佬吃饭吧！</span></h2>    <h6 style="color:#b39a87"> <span data-i18n="subtitle">一次与大佬亲密接触的机会，参与还能分NAS</span></h6></div><br></div>
+    <div class="container">
+        <div class="row">
+            <div id="requires" class="col-md-12"><span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://github.com/nebulasio/WebExtensionWallet">使用本网页需安装钱包插件，立即前往&gt;&gt;</a></span></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div style="border:2px solid;border-radius: 4px;padding:1em;font-size: 2pm;">
+                    <span data-i18n="rules">活动规则：在活动期间进行竞价，每次出价后系统会托管当前的竞价押金，并且自动退还前一出价人的押金，活动结束后出价最高者可赢得和大佬一起吃饭聊天的机会，押金将被系统扣除用作系统的运维，同时根据分成比例奖励给活动的所有参与者（参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数）。</span>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div id="bind-addr-box" class="alert alert-success" style="font-size:0.8em; margin-top:1rem;">
+                    <div style="width:3em;float:right;cursor: hand;" data-toggle="modal" data-target="#bind-addr-dialog">修改</div>
+                    <div class="text-nowrap" style="margin-right:3em;">
+                        <span>绑定地址：</span>
+                        <span id="bind-addr">n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8</span>                
+                        <!--a style="float:right;" onclick="onClearBindAddr()">清空</a-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div id="list" class="container transfer">
-        <div class="form-group row">
-            <div class=col>
+<div id="result" class="container">
+<div id="dinner-0" class="dinner card" data-hash="d8d224c9efefe2d0a9103d640459b53bd7a1c26f04348d2543ee1e971bfc80c4"><div class="dinner-header card-header bg-dinner" data-toggle="collapse" data-target="#dinner-body-0" onclick="void(0)"><div><span class="badge badge-pill badge-info">第1期</span><span class="badge badge-pill">（进行中）</span></div><h5><span class="float-right iconfont"></span><span style="margin-right:2em">
+    与义吉一起午餐
+</span></h5><div class="text-nowrap header-hash"><i style="font-size:0.8em">hash:"d8d224c9efefe2d0a9103d640459b53bd7a1c26f04348d2543ee1e971bfc80c4"</i><br></div></div><div id="dinner-body-0" class="card-body form-group collapse show" data-parent="#result"><div class="form-group row"><div class="w-100"></div><div class="col">
 
-<div style="text-align:center;">
-    <img style="width:60%" src="https://nebulas.io/assets/images/users/user-hitters.jpg" class="card-img-top" alt="徐义吉">
+<div>
+    <ul class="list-group">
+        <li class="list-group-item">&bull; 本期嘉宾：徐义吉</li>
+        <li class="list-group-item">&bull; 与餐时间：2018年6月内有效</li>
+        <li class="list-group-item">&bull; 与餐地点：上海或者北京</li>
+        <li class="list-group-item">&bull; 与餐人数：最多可带2人</li>
+        <li class="list-group-item">&bull; 与餐话题：不限</li>
+    </ul>
+</div>
+<br>
+<div style="text-align:center;border: 1px solid #dfdfdf;">
+    <img style="width:60%" src="images/000/user-hitters.png" class="card-img-top" alt="徐义吉">
 </div>
 <div class="card-block">
-    <h4 class="card-title">徐义吉</h4>
-    <p class="card-subtitle">创始人</p>
+    <h4 class="card-title" style="text-align: center;">徐义吉</h4>
     <p class="card-social-link"><a href="https://www.linkedin.com/in/hitters" target="_blank" class=""><i class="iconfont icon-linkedin"></i></a></p>
     <p class="card-text">星云链（Nebulas）&amp; 小蚁（AntShares）创始人，前蚂蚁金服区块链平台部负责人，前谷歌反作弊小组成员，同济大学计算机学士。2013年起创办了中国首个区块链技术社区比特创业营（<a href="http://bitsclub.io/cn/index.html" target="_blank" class="btn-link btn-blue-outline">BitsClub</a>）、中国首个专注于区块链行业投资基金FBG。</p>
 </div>
+
 和星云CTO一起篝火晚会
-<div style="text-align:center;">
+<div style="text-align:center;border: 1px solid #dfdfdf;">
     <img style="width:60%" src="https://nebulas.io/assets/images/users/user-robin.jpg" class="card-img-top" alt="钟馥百">
 </div>
 <div class="card-block">
@@ -39,9 +73,9 @@
     <p class="card-text">星云链（Nebulas）联合创始人，前蚂蚁金服区块链平台部架构师，前海豚浏览器高级研发总监、游戏业务负责人，毕业于华中科技大学，曾创办了中国首个区块链网络互助平台同心互助。</p>
 </div>
 
-            </div>
-        </div>
-    </div>
+
+</div></div> <hr><div class="row"><div class="col"><h6 style="text-align:center;">已完成(当前区块高度：381812)</h6><div class="progress"><div class="progress-bar bg-dinner" role="progressbar" value="381812" min="381795" aria-valuemax="381795" style="width:100%;"><span>100%</span></div></div></div></div><div class="row"><div class="col-md-12"><span style="float:left;" data-toggle="tooltip" title="" data-original-title="开始区块高度">381795</span><span style="float:right;" data-toggle="tooltip" title="" data-original-title="结束区块高度">381810</span></div></div> <hr><div class="row"><div class="col-md-6 text-nowrap">开始时间：<span class="begin-time">2018-06-08 11:47:00</span></div><div class="col-md-6 text-nowrap">结束时间：<span class="end-time">2018-06-08 11:50:45</span></div><div class="col-md-6 text-nowrap">最高竞价：0.1 NAS</div><div class="col-md-6 text-nowrap">最高竞家：<span style="color:#155724;" border-radius:5px;"="">n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8</span></div><div class="col-md-6">竞价次数：1次<a href="#bid-list-0" data-toggle="collapse" style="float:right;font-size:0.8em;"> 详情...</a></div><div class="col-md-6"><a data-toggle="tooltip" data-html="true" title="" data-original-title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：20 % <span class="iconfont icon-xinxi"></span></a></div></div><div id="bid-list-0" class="row bid-list collapse"><table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><tr><th width="40px">No</th><th>地址</th><th width="80px">出价</th></tr></thead><tbody><tr><td>1</td><td><div class="text-nowrap alert-success">n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8</div></td><td>0.1</td></tr></tbody></table></div><hr><div class="row form-group"><div class="col"><button class="btn btn-block" onclick="onTakeNas(this)">可领取 0.02 NAS</button></div></div></div></div>
+
 
     <div id=result class="container" >
     </div>
