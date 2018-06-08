@@ -352,6 +352,31 @@ DinnerContract.prototype = {
         dinner.endBlock = endBlock;
         this.dinners.set(hash,dinner);
     },
+    setMinBidStep:function(hash, minBidStep) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            throw new Error("no dinner matched!");
+        }
+        var from = Blockchain.transaction.from;
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            throw new Error("not owner address!");
+        }
+        dinner.minBidStep = minBidStep;
+        this.dinners.set(hash,dinner);
+    },
+
+    setMaxBidStep:function(hash, maxBidStep) {
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            throw new Error("no dinner matched!");
+        }
+        var from = Blockchain.transaction.from;
+        if(dinner.ownerAddr !== from && from !== this._creator) {
+            throw new Error("not owner address!");
+        }
+        dinner.maxBidStep = maxBidStep;
+        this.dinners.set(hash,dinner);
+    },
 
     //冻结活动
     lock:function(hash,locked) {
