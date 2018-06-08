@@ -1,0 +1,307 @@
+<!doctype>
+<html>
+
+<head>
+    <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/ui-block.css" rel="stylesheet">
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <title>设置饭局</title>
+    <meta name=viewport content="width=device-width">
+    <meta charset="utf-8">
+</head>
+<body>
+    <div class=logo-main></div>
+    <div class="title" style="text-align: center;"></div>
+
+    <div class="container transfer">
+        <div class="form-group row">
+            <div class=col-md-6>
+                <label data-i18n=list/issuer-address>Owner Address</label>
+                <div class="issuer icon-address" name="issuer"></div>
+            </div>
+            <div class=col-md-6>
+                <label data-i18n=list/contract-address>Contract Address</label>
+                <div class="contract icon-address" name="contract"></div>
+            </div>
+            <div class=col-md-6>
+                <label for="hash" data-i18n=new-dinner/hash>Hash</label>
+                <div class=input-group>
+                    <input id="hash" class="form-control" data-i18n="placeholder/hash">
+                    <button id="set-hash" class="btn input-group-btn"> 刷新 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="title" data-i18n=new-dinner/title>Title</label>
+                <div class=input-group>
+                    <input id="title" class="form-control" data-i18n="placeholder/title">
+                    <button id="set-title" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-12>
+                <label for=text>
+                    <span data-i18n=register/text>Text</span>
+                </label>
+                <div class="text">
+                    <textarea id="text" class="form-control" style="height: 120px;" data-i18n="placeholder/text"></textarea>
+                    <button id="set-text" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class=col>
+                <div style="background-color:lightblue;border:1px dashed;border-radius: 4px;color: darkslategray;width: 100%;padding:8px;font-size: 12px;">
+                    <span data-i18n="issue/tips"> </span>
+                    <span id="current-block">0</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class=col-md-6>
+                <label for="begin-block" data-i18n=new-dinner/begin-block>Begin Block</label>
+                <div class=input-group>
+                    <input id="begin-block" class="form-control" data-i18n="placeholder/begin-block">
+                    <button id="set-begin-block" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="end-block" data-i18n=new-dinner/end-block>End Block</label>
+                <div class=input-group>
+                    <input id="end-block" class="form-control" data-i18n="placeholder/end-block">
+                    <button id="set-end-block" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="min-bid-step" data-i18n=new-dinner/min-bid-step>Max Bid Step</label>
+                <div class=input-group>
+                    <input id="min-bid-step" class="form-control" data-i18n="placeholder/min-bid-step" value=0.1>
+                    <button id="set-min-bid-step" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="max-bid-step" data-i18n=new-dinner/max-bid-step>Max Bid Step</label>
+                <div class=input-group>
+                    <input id="max-bid-step" class="form-control" data-i18n="placeholder/max-bid-step" value=3>
+                    <button id="set-max-bid-step" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="share-percent" data-i18n=new-dinner/share-percent>Share Percent</label>
+                <div class=input-group>
+                    <input id="share-percent" class="form-control" data-i18n="placeholder/share-percent" value=20>
+                    <button id="set-share-percent" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+            <div class=col-md-6>
+                <label for="contact-info" data-i18n=new-dinner/contact-info>Contact Info</label>
+                <div class=input-group>
+                    <input id="contact-info" class="form-control" data-i18n="placeholder/contact-info" value=20>
+                    <button id="set-contact-info" class="btn input-group-btn"> 设置 </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">        
+            <div class="offset-md-2 col-md-4">
+                <button id=lock class="btn input-group-btn" data-i18n=new-dinner/lock>Lock</button>
+            </div>
+            <div class="offset-md-2 col-md-4">
+                <button id=unlock class="btn input-group-btn" data-i18n=new-dinner/unlock>Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <div id=result class="container" >
+    </div>
+    
+    <div class=footer></div>
+
+    <script src="libs/jquery-3.3.1.min.js"></script>
+    <script src="libs/bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js" data-depends="jquery.slim"></script>
+    <script src="libs/external/jquery.md5.js"></script>
+    <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
+    <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/blockies.min.js"></script>
+    <script src="dist/nebulas.js"></script>
+    <script src="libs/nebPay.js"></script>
+    <script src="js/1-localSave.js"></script>
+    <script src="js/home.v1.js"></script>
+    <script src="js/i18n.js" data-depends="jquery.slim"></script>
+    <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+    <script>
+            "use strict";
+    
+            var nebulas = require("nebulas"),
+                Transaction = nebulas.Transaction,
+                Utils = nebulas.Utils,
+                Unit = nebulas.Unit,
+                neb = new nebulas.Neb(),
+                validateAll = uiBlock.validate();
+
+            var queryNet = getQueryVariable("net");
+
+            uiBlock.insert({
+                footer: ".footer",
+                title: ".title",
+                header: ".header",
+                iconAddress: ".icon-address",
+                logoMain: [".logo-main", queryNet, queryNet==null],
+                numberComma: ".number-comma",
+            });
+
+            var lang = localSave.getItem("lang");
+            var contractAddr = localSave.getItem("contract");
+            var issuerAddr= localSave.getItem("issuer");
+
+            if((!os.isAndroid && !os.isPhone) && typeof (webExtensionWallet) === "undefined") {
+                bootbox.dialog({
+                    backdrop: true,
+                    onEscape: true,
+                    message: lang=='zh'?"需要安装 extensionWallet 插件！":"Need install extensionWallet plugin!",
+                    size: "large",
+                    title: "Error"
+                });
+            }
+            
+
+            neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
+
+            neb.api.getNebState().then(function(state) {
+                $("#current-block").text(state.height);
+                $("#begin-block").val(state.height);
+                $("#end-block").val(parseInt(state.height)+100*60/15);
+            });
+
+            var NebPay = require("nebpay");
+            var nebPay = new NebPay();
+
+            $(".icon-address.issuer input").val(issuerAddr);
+            $(".icon-address.contract input").val(contractAddr);
+
+
+            $("#set-hash").click(function(){
+                var hash = $("#hash").val();
+                var param = 
+                {
+                    from: issuerAddr,
+                    to: contractAddr,
+                    value: Unit.nasToBasic(Utils.toBigNumber("0")),
+                    nonce: 0,
+                    gasPrice: 1000000,
+                    gasLimit: 200000,
+                    contract: {"function":"info","args":JSON.stringify([hash])}
+                };
+                neb.api.call(param)
+                .then(function(tx) {
+                    let dinner = JSON.parse(tx.result);
+                    if(dinner) {
+                        $("#title").val(dinner.title);
+                        $("#text").val(dinner.text);
+                        $("#begin-block").val(dinner.beginBlock);
+                        $("#end-block").val(dinner.endBlock);
+                        $("#min-bid-step").val(dinner.minBidStep);
+                        $("#max-bid-step").val(dinner.maxBidStep);
+                        $("#share-percent").val(dinner.sharePercent);
+                        $("#contact-info").val(dinner.contactInfo||"");
+                        if(dinner.lock) {
+                            $("lock").attr("disabled","disabled");
+                            $("unlock").removeAttr("disabled");
+                        }
+                        else {
+                            $("unlock").attr("disabled","disabled");
+                            $("lock").removeAttr("disabled");
+                        }
+                    }
+                    else {
+                        bootbox.dialog({
+                            backdrop: true,
+                            onEscape: true,
+                            message: "没有找到活动："+hash,
+                            size: "large",
+                            title: "Error"
+                        });
+                    }
+                });
+            });
+
+            $("#set-title").click(function(){
+                var hash = $("#hash").val();
+                var title = $("#title").val();
+                onClickSetBtn(this,"setTitle",[hash,title]);
+            });
+
+            $("#set-text").click(function(){
+                var hash = $("#hash").val();
+                var text = $("#text").val();
+                onClickSetBtn(this,"setText",[hash,text]);
+            });
+
+            $("#set-begin-block").click(function(){
+                var hash = $("#hash").val();
+                var beginBlock = $("#begin-block").val();
+                onClickSetBtn(this,"setBeginBlock",[hash,beginBlock]);
+            });
+
+            $("#set-begin-block").click(function(){
+                var hash = $("#hash").val();
+                var endBlock = $("#end-block").val();
+                onClickSetBtn(this,"setEndBlock",[hash,endBlock]);
+            });
+
+            $("#set-share-percent").click(function(){
+                var hash = $("#hash").val();
+                var sharePercent = $("#share-percent").val();
+                onClickSetBtn(this,"setSharePercent",[hash,sharePercent]);
+            });
+
+            $("#set-min-bid-step").click(function(){
+                var hash = $("#hash").val();
+                var minBidStep = $("#min-bid-step").val();
+                onClickSetBtn(this,"setMinBidStep",[hash,minBidStep]);
+            });
+
+            $("#set-max-bid-step").click(function(){
+                var hash = $("#hash").val();
+                var maxBidStep = $("#max-bid-step").val();
+                onClickSetBtn(this,"setMaxBidStep",[hash,maxBidStep]);
+            });
+
+            $("#lock").click(function(){
+                var hash = $("#hash").val();
+                onClickSetBtn(this,"lock",[hash,true]);
+            });
+
+            $("#unlock").click(function(){
+                var hash = $("#hash").val();
+                onClickSetBtn(this,"lock",[hash,true]);
+            });
+            
+            function onClickSetBtn(btn,func,args) {
+                $(btn).attr("disabled", "disabled");
+                try {
+                    var serialNumber = nebPay.call(contractAddr,Unit.nasToBasic(Utils.toBigNumber(0)),func,JSON.stringify(args),{
+                        qrcode: {
+                            showQRCode: false
+                        },
+                        goods: {
+                            name: func
+                        },
+                        callback: localSave.getItem("callback"),
+                        listener: function(resp){
+                            $(btn).removeAttr("disabled");
+                            console.log("resp: " + JSON.stringify(resp))
+                        }  //set listener for extension transaction result
+                    });
+                } catch (e) {
+                    $(btn).removeAttr("disabled");
+                    bootbox.dialog({
+                        backdrop: true,
+                        onEscape: true,
+                        message: e,
+                        size: "large",
+                        title: "Error"
+                    });
+                }
+            }
+        </script>
+</body>
+</html>

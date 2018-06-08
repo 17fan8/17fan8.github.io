@@ -487,6 +487,7 @@
                             let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
                             let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
                             updateDinner(result,dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                            $("body").remove(".tooltip")
                         //}
                     });
                 },15000);

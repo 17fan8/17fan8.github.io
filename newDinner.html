@@ -6,7 +6,7 @@
     <link href="stylesheets/style.css" rel="stylesheet">
     <link href="stylesheets/ui-block.css" rel="stylesheet">
     <link href="stylesheets/base.css" rel="stylesheet">
-    <title>一起饭吧！</title>
+    <title>发布饭局</title>
     <meta name=viewport content="width=device-width">
     <meta charset="utf-8">
 </head>
@@ -17,8 +17,12 @@
     <div class="container transfer">
         <div class="form-group row">
             <div class=col-md-6>
-                <label data-i18n=list/owner-address>Owner Address</label>
-                <div class="owner icon-address" name="owner"></div>
+                <label data-i18n=list/issuer-address>Owner Address</label>
+                <div class="issuer icon-address" name="issuer"></div>
+            </div>
+            <div class=col-md-6>
+                <label data-i18n=list/contract-address>Contract Address</label>
+                <div class="contract icon-address" name="contract"></div>
             </div>
             <div class=col-md-6>
                 <label for="title" data-i18n=new-dinner/title>Title</label>
@@ -111,6 +115,9 @@
             });
 
             var lang = localSave.getItem("lang");
+            var contractAddr = localSave.getItem("contract");
+            var issuerAddr= localSave.getItem("issuer");
+
             if((!os.isAndroid && !os.isPhone) && typeof (webExtensionWallet) === "undefined") {
                 bootbox.dialog({
                     backdrop: true,
@@ -120,6 +127,7 @@
                     title: "Error"
                 });
             }
+            
 
             neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
 
@@ -133,14 +141,16 @@
             var nebPay = new NebPay();
 
             $("#issue").on("click", onClickIssue);
-            $(".icon-address.owner input").val("n1K2nSbJWiKVnHCAi7PFEjGef7iDQVFsTs8");
+            $(".icon-address.issuer input").val(issuerAddr);
+            $(".icon-address.contract input").val(contractAddr);
             $("#title").val("title");
             $("#text").val("text");
             
             function onClickIssue() {
-                var fromAddress, title, text, beginBlock, endBlock, minBidStep, maxBidStep, sharePercent, toAddress, amount, args;
+                var fromAddress, contractAddr, title, text, beginBlock, endBlock, minBidStep, maxBidStep, sharePercent, amount, args;
                 if (validateAll()) {
-                    fromAddress = $(".icon-address.owner input").val();
+                    fromAddress = $(".icon-address.issuer input").val();
+                    contractAddr = $(".icon-address.contract input").val();
                     title = $("#title").val();
                     text = $("#text").val();
                     beginBlock = $("#begin-block").val();
@@ -148,13 +158,12 @@
                     minBidStep = $("#min-bid-step").val();
                     maxBidStep = $("#max-bid-step").val();
                     sharePercent = $("#share-percent").val();
-                    toAddress = localSave.getItem("contract");;
                     amount = "0";
                     args=[fromAddress,title,text,beginBlock,endBlock,minBidStep,maxBidStep,sharePercent];
 
                     $("#issue").attr("disabled", "disabled");
                     try {
-                        var serialNumber = nebPay.call(toAddress,Unit.nasToBasic(Utils.toBigNumber(amount)),"addDinner",JSON.stringify(args),{
+                        var serialNumber = nebPay.call(contractAddr,Unit.nasToBasic(Utils.toBigNumber(amount)),"addDinner",JSON.stringify(args),{
                             qrcode: {
                                 showQRCode: false
                             },
