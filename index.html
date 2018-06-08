@@ -451,7 +451,7 @@
                 btnState = ' disabled=disabled';
                 btnClick = '';
                 startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges
-                endTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges;
+                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
                 na=' na';
             }
             else if(dinner.endBlock>currentBlock){
