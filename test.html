@@ -1,0 +1,980 @@
+<!doctype>
+<html>
+
+<head>
+    <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.css" rel="stylesheet">
+    <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet">
+    <link href="fonts/iconfont.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/ui-block.css" rel="stylesheet">
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/touch-icon-iphone.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="images/touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="images/touch-icon-iphone4.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="和大佬吃饭吧！">
+    <meta property="og:description" content="一次与大佬近距交流的机会，参与还能分星云币">
+    <meta property="og:image" content="images/icon-108px.png">
+    <meta property="og:url" content="https://17fan8.github.io/">
+
+    <link rel="stylesheet" type="text/css" href="libs/addtohomescreen/style/addtohomescreen.css">
+    <title>和大佬吃饭吧！</title>
+    <meta name=viewport content="width=device-width">
+    <meta charset="utf-8">
+    <style>
+     .tooltip-inner > p {
+        text-align:left;
+    }
+    .table th, .table td {
+        padding:0.5em;
+        text-align: center;
+    }
+    .bid-list {
+        box-shadow:0 0 1.6em 0.2em gray inset;
+    }
+    a[disabled] {
+        color:lightgrey !important;
+    }
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #e06400;
+        border-color: #e06400;
+    }
+    .page-link{
+        color: #e06400;        
+    }
+ </style>
+</head>
+<body>
+    <div style="display:none;"><img src="images/icon-108px.png" alt=""></div>
+    <div class=logo-main></div>
+    <div class="title" style="text-align: center;color:#6f3304;"></div>
+    <div class="container">
+        <div class="row">
+            <div id=requires class="col-md-12">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div style="border:2px solid;border-radius: 4px;padding:1em;font-size: 2pm;">
+                    <span data-i18n="rules"></span>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div id="bind-addr-box" class="alert" style="font-size:0.8em; margin-top:1rem;">
+                    <div style="width:3em;float:right;cursor: hand;" data-toggle="modal" data-target="#bind-addr-dialog">修改</div>
+                    <div class="text-nowrap" style="margin-right:3em;">
+                        <span>绑定地址：</span>
+                        <span id="bind-addr"></span>                
+                        <!--a style="float:right;" onclick="onClearBindAddr()">清空</a-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id=result class="container" >
+    </div>
+    <hr>
+    <div class=footer></div>
+
+    <!-- 竞投对话框 -->
+    <div class="modal fade" id="bid-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 id="dlg-title" class="modal-title">竞价</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="container" >
+                        <div class="row from-group" style="display:none;">
+                            <div class="col-md-12">
+                                <label for="dlg-email">EMail：</label>
+                                <input id="dlg-email" class="form-control">
+                            </div>
+                            <div class="col-md-12">
+                                <label for="dlg-email-repeat">确认EMail：</label>
+                                <input id="dlg-email-repeat" class="form-control">
+                            </div>
+                        </div>
+                        <div class=row>
+                            <div class="col-md-12">
+                                <label for="dlg-number">出价：</label>
+                                <label id="dlg-bid-nas" class=float-right></label>                                
+                            </div>
+                            <div class="w-100"></div>
+                            <div class="col">
+                                <input id="dlg-number" style="width:100%;" data-slider-id="ex1Slider" type="text"/>
+                            </div>
+                            <div class="col-md-12">
+                                <span class="iconfont icon-xinxi" style="font-size:0.8em;">请确保支付的钱包地址与绑定地址一致！</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer form-group">
+                    <div class="container" >
+                        <div class=row>
+                            <div class="offset-md-2 col-md-4">
+                                <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
+                            </div>
+                            <div class="offset-md-2 col-md-4">
+                                <button id="bid-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onBid()">确定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 绑定钱包地址对话框 -->
+    <div class="modal fade" id="bind-addr-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 id="bind-addr-title" class="modal-title">绑定钱包</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="container" >
+                        <div class="row from-group">
+                            <div class="col-md-12">
+                                <label for="bind-addr-addr">钱包地址（请用该钱包参与活动）：</label>
+                                <div class="icon-address" placeholder="输入要绑定的钱包地址"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer form-group">
+                    <div class="container" >
+                        <div class=row>
+                            <div class="col-md-4 offset-md-2">
+                                <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="bind-addr-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onBindAddr()">绑定</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 登记联系方式 -->
+    <div class="modal fade" id="contact-info-dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- 模态框头部 -->
+                <div class="modal-header">
+                    <h4 id="bind-addr-title" class="modal-title">提交联系方式</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- 模态框主体 -->
+                <div class="modal-body">
+                    <div class="container" >
+                        <div class="row from-group">
+                            <div class="col-md-12">
+                                <h6 id="congratulations" style="color:tomato">恭喜</h4>
+                            </div>
+                        </div>
+                        <div class="row from-group">
+                            <div class="col-md-12">
+                                <label for="contact-info">联系方式：</label>
+                                <input id="contact-info" class="form-control" placeholder="输入有效的联系方式，如手机号码、微信号、qq号等">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 模态框底部 -->
+                <div class="modal-footer form-group">
+                    <div class="container" >
+                        <div class=row>
+                            <div class="col-md-4 offset-md-2">
+                                <button type="button" class="btn btn-block btn-mutil-line" data-dismiss="modal">取消</button>
+                            </div>
+                            <div class="col-md-4">
+                                <button id="contact-info-ok" type="button" class="btn btn-block btn-mutil-line" onclick="onSubmitContactInfo()">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="weixin-tip">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div style="text-align:center; padding:1em;">
+                    <div style="color: saddlebrown;margin:2em 0;" >请点击右上角的“...”，选择在浏览器打开</div>
+                    <img style="border-radius:0.5em;width: 100%;border: 2px solid;" src="images/weixin-tip.png" >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="libs/jquery-3.3.1.min.js"></script>
+    <script src="libs/bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js" data-depends="jquery.slim"></script>
+    <script src="libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+    <script src="libs/external/jquery.md5.js"></script>
+    <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
+    <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/addtohomescreen/src/addtohomescreen.js"></script>
+    <script src="libs/blockies.min.js"></script>
+    <script src="dist/nebulas.js"></script>
+    <script src="libs/nebPay.js"></script>
+    <script src="js/1-localSave.js"></script>
+    <script src="js/home.v1.js"></script>
+    <script>
+        localSave.setItem("lang","zh");
+    </script>
+    <script src="js/i18n.js" data-depends="jquery.slim"></script>
+    <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+    <script>
+        "use strict";
+        addToHomescreen({
+            //startDelay: 5, //开始的间隔
+            skipFirstVisit: true, //首次跳过出现
+            maxDisplayCount: 1 //最多出现次数
+        });
+
+        var nebulas = require("nebulas"),
+            Transaction = nebulas.Transaction,
+            Utils = nebulas.Utils,
+            Unit = nebulas.Unit,
+            neb = new nebulas.Neb(),
+            validateAll = uiBlock.validate();
+
+        var queryNet = getQueryVariable("net")||"mainnet";
+
+        uiBlock.insert({
+            footer: ".footer",
+            title: ".title",
+            header: ".header",
+            iconAddress: ".icon-address",
+            logoMain: [".logo-main", queryNet, false],
+            numberComma: ".number-comma",
+        });
+
+        var lang = localSave.getItem("lang");
+        var contractAddr = localSave.getItem("contract");
+        var issuerAddr= localSave.getItem("issuer");
+        
+        
+
+        if((!os.isAndroid && !os.isPhone)) {
+            if(typeof (webExtensionWallet) !== "undefined" ){
+                $("#requires").html('<span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://github.com/nebulasio/WebExtensionWallet">使用本网页需安装钱包插件，立即前往>></a></span>');
+            }
+        }
+        else {
+            $("#requires").html(' <span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://nano.nebulas.io/">使用本网页需安装星云钱包，立即前往>></a></span>');
+        }
+
+        neb.setRequest(new nebulas.HttpRequest(localSave.getItem("apiPrefix")));
+
+        var NebPay = require("nebpay");
+        var nebPay = new NebPay();
+
+        if(isWeixin()) {
+            $("#weixin-tip").modal("show");
+        }
+        else {
+            var bindAddr=localSave.getItem("bindAddr");
+            if(!bindAddr||bindAddr=="") {
+                $("#bind-addr-dialog").modal("show");
+                $("#bind-addr").text("未绑定");
+                $("#bind-addr-box").addClass("alert-warning")
+            }
+            else {
+                $("#bind-addr").text(bindAddr);
+                $("#bind-addr-box").addClass("alert-success")
+            }
+        }
+        
+        var currentBlock = 0;
+        neb.api.getNebState().then(function(state) {
+            currentBlock = parseInt(state.height);
+            listByIssuer(issuerAddr);
+
+            //自动刷新当前区块高度
+            setInterval(function(){
+                neb.api.getNebState().then(function(state) {
+                    currentBlock = parseInt(state.height);
+                });
+            },1500);
+        });
+
+        //计算可领取的NAS
+        function getShareNas(dinner) {
+            var sharedNas = Utils.toBigNumber(0);
+            var tookNas = Utils.toBigNumber(0);
+            if(bindAddr&&bindAddr!="") {
+                var topBidNas = Utils.toBigNumber(0);
+                var bidders = dinner.bidders;
+                if(bidders.length>0) {
+                    var topBidder = bidders[bidders.length-1];
+                    topBidNas = topBidder.nas;
+                }
+
+                var sharedUnit = topBidNas.times(dinner.sharePercent).div(100*dinner.bidders.length);
+                for(var i=0;i<bidders.length;++i) {
+                    var bidder = bidders[i];
+                    if(bidder.addr==bindAddr) {
+                        if(!bidder.nasTook)
+                            sharedNas = sharedNas.plus(sharedUnit);
+                        else
+                            tookNas = tookNas.plus(sharedUnit);
+                    }
+                }
+            }
+            return {sharedNas:sharedNas,tookNas:tookNas};
+        }
+
+        function onPageTo(obj,page) {
+            var dinnerDiv = $(obj).closest(".dinner");
+            var hash = dinnerDiv.attr("data-hash");
+            var dinner = dinners[hash];
+            dinnerDiv.find('#bid-list-'+dinner.id).html(setPage(dinner.bidders,page));
+        }
+
+        function onPagePrev(obj) {
+            var pagination = $(obj).closest(".pagination");
+            var page = parseInt(pagination.attr('page')-1);
+            onPageTo(obj,page);
+        }
+
+        function onPageNext(obj) {
+            var pagination = $(obj).closest(".pagination");
+            var page = parseInt(pagination.attr('page')+1);
+            onPageTo(obj,page);
+        }
+
+        function setPage(bidders, page) {
+            var html = '<table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>No</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
+            var from = bidders.length-1-page*10;
+            var to = from-10;
+            if(to<0)
+                to=0;
+            for(let i=from;i>=to;--i) {
+                html+='<tr>' +
+                '<td>'+ (bidders.length-i) +'</td>' +
+                '<td><div class="text-nowrap'+(bidders[i].addr===bindAddr?' alert-success':'') +'">'+ bidders[i].addr+'</div></td>' +
+                '<td>'+ bidders[i].nas+'</td>' +
+                '</tr>';
+            }
+            html+="</tbody></table>";
+            var pages = parseInt((bidders.length+9)/10);
+            if(bidders.length>10) {
+                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;" page='+page+'>' +
+                    '<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:" '+(page==0?'disabled=disabled':'onclick="onPagePrev(this)"')+'>前一页</a></li>';
+                for(let p=0;p<pages;++p) {
+                    html +='<li class="page-item'+(page==p?' active':'')+'"><a class="page-link" href="javascript:" onclick="onPageTo(this,'+p+')">'+(p+1)+'</a></li>';
+                }
+                html +='<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:"'+(page==pages-1?'disabled=disabled':'onclick="onPageNext(this)"')+'>后一页</a></li>' +
+                '</ul>';
+            }
+            return html;
+        }
+        
+        var dinners={};
+        function parseDinner(tx) {
+            var dinner = JSON.parse(tx.result);
+            if(!!dinner && !!dinner.hash) {
+                var bidders = dinner.bidders;
+                dinner.minBidStep=dinner.minBidStep||0.1;
+                dinner.maxBidStep=dinner.maxBidStep||5;
+                for(var i=0;i<bidders.length;++i) {
+                    var bidder = bidders[i];
+                    bidder.nasInWei = Utils.toBigNumber(bidder.nasInWei);
+                    bidder.nas = Unit.fromBasic(bidder.nasInWei,"nas");
+                }
+            }
+            return dinner;
+        }
+        function updateDinner(result,dinner,show,showBidList=false,page=0,bidStateDom=null) {
+            var progressValue =0;
+            if(dinner.endBlock>dinner.beginBlock) {
+                progressValue= ((currentBlock-dinner.beginBlock)*100/(dinner.endBlock-dinner.beginBlock)).toFixed(2);
+                if(progressValue<0)
+                    progressValue=0;
+                if(progressValue>100)
+                    progressValue=100;
+            }
+            var topBidNas = Utils.toBigNumber(0), topBidderAddr="空缺";
+            var bidders = dinner.bidders;
+            if(bidders.length>0) {
+                var topBidder = bidders[bidders.length-1];
+                topBidNas = topBidder.nas;
+                topBidderAddr = topBidder.addr;
+
+                //提示玩家登记联系地址
+                if(currentBlock>=dinner.endBlock && topBidder.addr==bindAddr && (!dinner.contactInfo||dinner.contactInfo=="")) {
+                    var dlgDOM = $("#contact-info-dialog")[0];
+                    if(!dlgDOM.dinners) {
+                        dlgDOM.dinners=[dinner];
+                    }
+                    else {
+                        dlgDOM.dinners.push(dinner);
+                    }                
+                }
+            }
+            var decimal = getValueDecimal(dinner.minBidStep);
+            var sharePercent = parseFloat(dinner.sharePercent||"0");
+            
+            var dinnerDiv = result.children('#dinner-'+dinner.id);
+            if(dinnerDiv.length===0) {
+                result.append('<div id="dinner-'+dinner.id+'" class="dinner card'+'" data-hash="' + dinner.hash + '">' + '</div>');
+                dinnerDiv = result.children().last();
+            }
+
+            const lockStr = dinner.locked?"(暂停)":"";
+            const badges = '<span class="badge badge-info badge-pill" data-toggle="tooltip" title="本时间根据区块高度计算得到">预计</span>';
+            var stateText,progressClass,btnText,btnState,btnClick,startTime,endTime;
+            var na;
+            if(dinner.beginBlock>currentBlock) {
+                stateText = '未开始';
+                progressClass='class="progress-bar progress-bar-striped bg-dinner"';
+                btnText = "我要竞价"+lockStr;
+                btnState = ' disabled=disabled';
+                btnClick = '';
+                startTime = formatTime(Date.now()+(dinner.beginBlock-currentBlock)*15000)+badges
+                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
+                na=' na';
+            }
+            else if(dinner.endBlock>currentBlock){
+                stateText = '竞拍中';
+                progressClass='class="progress-bar progress-bar-striped progress-bar-animated bg-dinner"';
+                btnText = "我要竞价"+lockStr;
+                btnState = dinner.locked?' disabled=disabled':'';
+                btnClick = ' onclick="showBidDialog(this)"';
+                startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
+                endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
+                na='';
+
+                var reflashDinner=setInterval(function(){
+                    clearInterval(reflashDinner);
+                    var param = 
+                    {
+                        from: issuerAddr,
+                        to: contractAddr,
+                        value: Unit.nasToBasic(Utils.toBigNumber("0")),
+                        nonce: 0,
+                        gasPrice: 1000000,
+                        gasLimit: 200000,
+                        contract: {"function":"info","args":JSON.stringify([dinner.hash])}
+                    };
+                    neb.api.call(param)
+                    .then(function(tx) {
+                        let newDinner = parseDinner(tx);
+                        newDinner.id=dinner.id;
+                        //if(JSON.stringify(newDinner)!==JSON.stringify(dinner)) {使用本判断会使进度不刷新
+                            dinners[newDinner.hash] = newDinner;
+                            let show = $('#dinner-body-'+dinner.id).hasClass("show");
+                            let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
+                            let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
+                            let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
+                            updateDinner(result,dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                            $(".tooltip").remove();
+                        //}
+                    });
+                },15000);
+            }
+            else {
+                var takeNas = getShareNas(dinner);
+                stateText = '已完成';
+                progressClass='class="progress-bar bg-dinner"';
+                btnText = takeNas.tookNas.gt(0)?"已领取 "+takeNas.tookNas+" NAS":
+                    (takeNas.sharedNas.gt(0)? "可领取 "+takeNas.sharedNas+" NAS":"可领取 0 NAS");
+                btnText = btnText + lockStr;
+                btnState = (takeNas.sharedNas.eq(0)||dinner.locked)?' disabled=disabled':'';
+                btnClick = ' onclick="onTakeNas(this)"';
+                startTime = queryBlockTime(dinnerDiv, ".begin-time", dinner.beginBlock);
+                endTime = queryBlockTime(dinnerDiv, ".end-time", dinner.endBlock);
+                na=' na';
+            }
+
+            if(na!=='')
+                dinnerDiv.addClass(na);
+
+            var collapseState;
+            var collapseShow;
+            if(show) {
+                collapseState = '';
+                collapseShow = ' show';
+            }
+            else {
+                collapseState = ' collapsed';
+                collapseShow = '';
+            }
+
+            var bidList = setPage(bidders,page);
+
+            var html =
+                '<div class="dinner-header card-header bg-dinner'+collapseState+na+'" data-toggle="collapse" data-target="#dinner-body-'+dinner.id+'" onclick="void(0)">' +
+                    '<div><span class="badge badge-pill badge-info'+na+'">第'+(dinner.id+1)+'期</span>' +
+                    '<span class="badge badge-pill">（'+stateText+'）</span></div>' +
+                    '<h5><span class="float-right iconfont"></span>'  +
+                    '<span style="margin-right:2em">'+dinner.title+'</span></h5>' +
+                    '<div class="text-nowrap header-hash">' +
+                        '<i style="font-size:0.8em">hash:"'+ dinner.hash +'"</i><br>' +
+                    '</div>' +
+                '</div>' +
+                '<div id="dinner-body-'+dinner.id+'" class="card-body form-group collapse'+collapseShow+'" data-parent="#result">' +
+                '<div class="form-group row">' +
+                    '<div class="w-100"></div>' +
+                    '<div class=col>' +
+                        dinner.text +
+                    '</div>'+
+                '</div> <hr>'+
+                '<div class=row>' +
+                    '<div class=col>' +
+                        '<h6 style="text-align:center;">'+stateText+'(当前区块高度：'+currentBlock+')</h6>' +
+                        '<div class="progress">' +
+                            '<div ' + progressClass + ' role="progressbar" ' +
+                                'value='+currentBlock+' min=' + dinner.beginBlock + 
+                                ' aria-valuemax=' + dinner.beginBlock + ' style="width:'+progressValue+'%;">'+
+                                '<span style="min-width:6em;">'+progressValue+'%</span>'+
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="col-md-12">' +
+                        '<span style="float:left;" data-toggle="tooltip" title="开始区块高度">' + dinner.beginBlock+'</span>' +
+                        '<span style="float:right;" data-toggle="tooltip" title="结束区块高度">' + dinner.endBlock+'</span>' +
+                    '</div>' +
+                '</div> <hr>' +
+                '<div class="row">' +
+                    '<div class="col-md-6 text-nowrap">' +
+                        '开始时间：<span class="begin-time">'+startTime+'</span>' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' +
+                        '结束时间：<span class="end-time">'+endTime+'</span>' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' + 
+                        '最高竞价：'+ topBidNas.toFixed(decimal) + ' NAS' +
+                    '</div>' +
+                    '<div class="col-md-6 text-nowrap">' + 
+                        '最高竞家：<span style="'+(topBidderAddr===bindAddr&&bindAddr!=""?'color:#155724;':'color:#721c24;') +'"border-radius:5px;">'+ topBidderAddr + '</span>' +
+                    '</div>' +
+                    '<div class="col-md-6">' + 
+                        '竞价次数：'+ dinner.bidders.length + '次' +
+                        '<a href="#bid-list-'+dinner.id+'" data-toggle="collapse" style="float:right;font-size:0.8em;"> 详情...</a>' +
+                    '</div>' +
+                    '<div class=col-md-6>' +
+                        '<a data-toggle="tooltip" data-html=true title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：'+ (dinner.sharePercent||0)+' % <span class="iconfont icon-xinxi"></span></a>' +
+                    '</div>' +
+                '</div>' +
+                '<div id=bid-list-'+dinner.id+' class="row bid-list collapse'+(showBidList?' show':'')+'">'+
+                    bidList +
+                '</div>' +
+                '<hr>' +
+                '<div class="row form-group">'+
+                    '<div class=col>' +
+                        '<button class="btn btn-block" '+btnState+btnClick+'>'+btnText+'</button>' +
+                    '</div>' +
+                '</div>'+(bidStateDom?bidStateDom.outerHTML:'') +
+                '</div>';
+            dinnerDiv.html(html);
+            dinnerDiv.find('[data-toggle="tooltip"]').tooltip();
+        }
+
+        function queryBlockTime(result,spanClassName,height) {
+            var timestamp = localSave.getItem("blockTime."+height);
+            if(timestamp) {
+                return formatTime(parseInt(timestamp)*1000);
+            }
+            
+            neb.api.getBlockByHeight({height:height,fullTransaction:false}).then(function(block) {
+                localSave.setItem("blockTime."+height,block.timestamp);
+                result.find(spanClassName).text(formatTime(block.timestamp*1000));
+            });
+            return "";
+        }
+
+        function getNextInfo(result,param,ids,pos) {
+            --pos;
+            if(pos>=0) {
+                getInfo(result,param,ids,pos);
+            }
+            else{
+                //没有下一个活动了
+                var firstItem = result.children(".dinner").first();
+                var pageWidth = firstItem.children().first().outerWidth();
+                if(result.width()<pageWidth) {
+                    var offset = result.outerWidth(true)-firstItem.width();
+                    result.css({"transform":"scale("+result.outerWidth(true)/(pageWidth+offset)+")",
+                    "transformOrigin":"left top"});
+                }
+
+                var dlgDOM = $("#contact-info-dialog")[0];
+                if(dlgDOM.dinners) {
+                    let congratulations = '恭喜你赢得了:';
+                    for(let i=0;i<dlgDOM.dinners.length;++i) {
+                        congratulations+= '"' + dlgDOM.dinners[i].title + '"';
+                        if(i+1<dlgDOM.dinners.length)
+                            congratulations+="、"
+                    }
+                    congratulations+="，请赶紧提交你的联系方式，好让我们找到你吧！"
+                    $("#congratulations").text(congratulations);
+                    $("#contact-info-dialog").modal("show");  
+                }  
+            }
+        }
+
+        function getInfo(result,param,ids,pos) {
+            var hash = ids[pos];
+            var dinner = dinners[hash];
+            if (!!dinner) {
+                updateDinner(result,dinner,pos==ids.length-1);
+                getNextInfo(result,param,ids,pos);
+                return;
+            }
+            param.contract={"function":"info","args":JSON.stringify([hash])};
+            neb.api.call(param)
+            .then(function(tx) {
+                dinner = parseDinner(tx);
+                if(!!dinner && !!dinner.hash) {
+                    dinners[dinner.hash] = dinner;
+                    dinner.id=pos;
+                    updateDinner(result,dinner,pos==ids.length-1);
+                    getNextInfo(result,param,ids,pos);
+                }
+                else {
+                    console.log("parse dinner data fails.");
+                }
+            });
+        }
+
+        function listByIssuer(issuer) {
+            var toAddress, contract;
+            toAddress = localSave.getItem("contract");
+            contract={"function":"listByIssuer","args":JSON.stringify([issuer])}
+        
+            try {
+                var temp = 
+                {
+                    from: issuer,
+                    to: toAddress,
+                    value: Unit.nasToBasic(Utils.toBigNumber("0")),
+                    nonce: 0,
+                    gasPrice: 1000000,
+                    gasLimit: 200000,
+                    contract: contract
+                };
+                var result = $("#result");
+                result.html("");
+                neb.api.call(temp).then(function(tx) {
+                    if(!tx||!tx.result){
+                        result.html("query fails.");
+                        $("#queryByIssuer").removeAttr("disabled");                                                                
+                        return;                                        
+                    }
+                    
+                    var txResult = JSON.parse(tx.result);
+                    if(!txResult || !txResult.ids || txResult.ids.length===0) {
+                        result.html("no data.");
+                        $("#queryByIssuer").removeAttr("disabled");                                                                
+                    }
+                    else {
+                        getInfo(result,temp,txResult.ids,txResult.ids.length-1);
+                    }
+                });
+            } catch (e) {
+                $("#queryByIssuer").removeAttr("disabled");                            
+                bootbox.dialog({
+                    backdrop: true,
+                    onEscape: true,
+                    message: e,
+                    size: "large",
+                    title: "Error"
+                });
+            }
+        }
+        function onBid() {
+            var hash, toAddress, email, amount, args;
+            toAddress = localSave.getItem("contract");                
+            email = "";
+            amount = $("#dlg-number").val();
+            hash = $("#bid-dialog").attr("data-hash");
+            args=[hash,email];
+
+            var intervalWaitPay;
+            var dinner = dinners[hash];
+            $("#bid-ok").attr("disabled", "disabled");
+            try {
+                var serialNumber = nebPay.call(toAddress,amount,"bid",JSON.stringify(args),{
+                    qrcode: {
+                        showQRCode: false
+                    },
+                    goods: {
+                        name: "bid"
+                    },
+                    callback: localSave.getItem("callback"),
+                    listener: listener  //set listener for extension transaction result
+                });
+
+                let bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                if(bidState.length>0) {
+                    bidState.html('正在等待支付...(<span>0秒</span>)');
+                    bidState.removeClass("text-success");
+                    bidState.removeClass("text-danger");
+                    bidState.addClass("text-info");
+                }
+                else {
+                    $('#dinner-body-'+dinner.id).append('<div class="bid-state">正在等待支付...(<span>0秒</span>)</div>');
+                    bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                    bidState.addClass("text-info");
+                }
+                
+                var secForWait = 0;
+                var intervalWaitPay = setInterval(function(){
+                    ++secForWait;
+                    $('#dinner-body-'+dinner.id + ' > .bid-state > span').text(secForWait+"秒");
+                    },1000);
+
+                $("#bid-ok").removeAttr("disabled");
+                $("#bid-dialog").modal('toggle');
+            } catch (e) {
+                $("#bid-ok").removeAttr("disabled");
+                bootbox.dialog({
+                    backdrop: true,
+                    onEscape: true,
+                    message: e,
+                    size: "large",
+                    title: "Error"
+                });
+            }
+
+            var intervalQuery = setInterval(function () {
+                funcIntervalQuery();
+            }, 10000);
+
+            function funcIntervalQuery() {
+                var options = {
+                    callback: localSave.getItem("callback")
+                }
+                nebPay.queryPayInfo(serialNumber,options)   //search transaction result from server (result upload to server by app)
+                .then(function (resp) {
+                    console.log("sn:"+serialNumber+",tx result: " + resp)   //resp is a JSON string
+                    var respObject = JSON.parse(resp)
+                    if(respObject.code === 0 && respObject.data.status!=2){
+                        clearInterval(intervalQuery);
+                        clearInterval(intervalWaitPay);
+                        if(respObject.data.execute_error=="") {
+                            dinner.bidders.push({
+                                hash:respObject.data.hash,
+                                addr:respObject.data.from,
+                                nasInWei:Utils.toBigNumber(respObject.data.value),
+                                nas:Unit.fromBasic(respObject.data.value,"nas"),
+                                time:parseInt(respObject.data.timestamp),
+                                user:""
+                            });
+                            
+                            //刷新dinner
+                            let show = $('#dinner-body-'+dinner.id).hasClass("show");
+                            let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
+                            let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
+                            updateDinner($("#result"),dinner,show,showBidList,page);
+
+                            $('#dinner-body-'+dinner.id).append('<div class="bid-state">竞价成功！</div>');
+                            bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                            bidState.removeClass("text-info");
+                            bidState.addClass("text-success");
+                        }
+                        else {
+                            bidState.html('竞价失败！（'+respObject.data.execute_error+'）');
+                            bidState.removeClass("text-info");
+                            bidState.addClass("text-danger");
+                        }
+                    }
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+            }
+
+            function listener(resp) {
+                console.log("resp: " + JSON.stringify(resp))
+            }
+        }
+
+        function onTakeNas(btn) {
+            var hash, toAddress, amount, args;
+            hash = $(btn).closest(".dinner").attr("data-hash");
+            toAddress = localSave.getItem("contract");
+            amount = "0";
+            args=[hash];
+            try {
+                var dinner = dinners[hash];
+                for(var i=0;i<dinner.bidders.length;++i) {
+                    if(dinner.bidders[i].addr == bindAddr)
+                        dinner.bidders[i].tookNas=true;
+                }
+                $(btn).attr("disabled","disabled");
+                var btnText = $(btn).text();
+                $(btn).text(btnText.replace("可","已"));
+
+                var serialNumber = nebPay.call(toAddress,amount,"takeNasByBidder",JSON.stringify(args),{
+                    qrcode: {
+                        showQRCode: false
+                    },
+                    goods: {
+                        name: "takeNasByBidder"
+                    },
+                    callback: localSave.getItem("callback"),
+                    listener: function(resp){
+                        console.log("resp: " + JSON.stringify(resp))
+                    }  //set listener for extension transaction result
+                });
+                var intervalQuery = setInterval(function () {
+                    funcIntervalQuery();
+                }, 10000);
+
+                function funcIntervalQuery() {
+                    var options = {
+                        callback: localSave.getItem("callback")
+                    }
+                    nebPay.queryPayInfo(serialNumber,options)   //search transaction result from server (result upload to server by app)
+                    .then(function (resp) {
+                        console.log("tx result: " + resp)   //resp is a JSON string
+                        var respObject = JSON.parse(resp)
+                        if(respObject.code === 0){
+                            clearInterval(intervalQuery);
+                        }
+                    })
+                    .catch(function (err) {
+                        console.log(err);
+                    });
+                }
+            } catch (e) {
+                bootbox.dialog({
+                    backdrop: true,
+                    onEscape: true,
+                    message: e,
+                    size: "large",
+                    title: "Error"
+                });
+            }
+        }
+
+        function showBidDialog(btn){
+            var hash = $(btn).closest(".dinner").attr("data-hash");
+            var dinner = dinners[hash];
+            if(!!dinner) {
+                $("#dlg-title").text("竞价 - "+dinner.title);
+                var topBidNas = Utils.toBigNumber(0);
+                if(dinner.bidders.length>0) {
+                    var topBidder = dinner.bidders[dinner.bidders.length-1];
+                    topBidNas = topBidder.nas;
+                }
+                var decimal = getValueDecimal(dinner.minBidStep);
+                
+                var dlgNumber = $("#dlg-number");
+
+                if(dlgNumber[0].slide)
+                    dlgNumber.slider('destroy');
+
+                let minStep1 = Utils.toBigNumber(dinner.minBidStep);
+                let minStep2 = Utils.toBigNumber(dinner.maxBidStep).div(10);
+                let defaultNas = topBidNas.plus(minStep2.lt(minStep1)?minStep1:minStep2);
+                $("#dlg-bid-nas").text(defaultNas.toFixed(decimal) +" NAS");
+                dlgNumber.val(defaultNas.toFixed(decimal));
+                dlgNumber.attr({
+                    "data-slider-step":dinner.minBidStep,
+                    "data-slider-min":topBidNas.plus(dinner.minBidStep),
+                    "data-slider-max":topBidNas.plus(dinner.maxBidStep),
+                    "data-slider-value":defaultNas
+                });
+                $("#bid-dialog").attr("data-hash",hash);
+                $("#bid-dialog").modal('show');
+
+                dlgNumber.slider({
+                    formatter: function(value) {
+                        return value+' NAS';
+                    }
+                });
+                dlgNumber.on("slide", function(slideEvt) {
+                    $("#dlg-bid-nas").text(slideEvt.value+" NAS");
+                });
+                dlgNumber[0].slide=true;
+            }
+        }
+
+        function onBindAddr() {
+            var validateAll = uiBlock.validate("#bind-addr-dialog");
+            if (validateAll()) {
+                bindAddr = $("#bind-addr-dialog .icon-address input").val();
+                localSave.setItem("bindAddr",bindAddr);
+                $("#bind-addr").text(bindAddr);
+                $("#bind-addr-box").removeClass("alert-warning");
+                $("#bind-addr-box").addClass("alert-success");
+                $("#bind-addr-dialog").modal("toggle");
+            }
+        }
+        function onClearBindAddr() {
+            bindAddr="";
+            localSave.setItem("bindAddr",bindAddr);
+            $("#bind-addr").text(bindAddr);
+            $("#bind-addr-box").removeClass("alert-success");
+            $("#bind-addr-box").addClass("alert-warning");
+        }
+
+        function onSubmitContactInfo(btn) {
+            var hash, toAddress, amount, args;
+            toAddress = localSave.getItem("contract");
+            amount = "0";
+            var dlgDOM = $("#contact-info-dialog")[0];
+            var contactInfo = $("#contact-info").val();
+            if(dlgDOM.dinners) {
+                for(let i=0;i<dlgDOM.dinners.length;++i) {
+                    hash = dlgDOM.dinners[i].hash;
+                    args=[hash,contactInfo];
+                    try {
+                        var serialNumber = nebPay.call(toAddress,amount,"setContactInfo",JSON.stringify(args),{
+                            qrcode: {
+                                showQRCode: false
+                            },
+                            goods: {
+                                name: "setContactInfo"
+                            },
+                            callback: localSave.getItem("callback"),
+                            listener: function(resp){
+                                console.log("resp: " + JSON.stringify(resp))
+                            }  //set listener for extension transaction result
+                        });
+                    } catch (e) {
+                        bootbox.dialog({
+                            backdrop: true,
+                            onEscape: true,
+                            message: e,
+                            size: "large",
+                            title: "Error"
+                        });
+                    }
+                }
+            }
+            $("#contact-info-dialog").modal("toggle");
+        }
+    </script>
+</body>
+</html>
