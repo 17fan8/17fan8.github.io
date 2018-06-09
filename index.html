@@ -275,7 +275,7 @@
         
 
         if((!os.isAndroid && !os.isPhone)) {
-            if(typeof (webExtensionWallet) !== "undefined" ){
+            if(typeof (webExtensionWallet) === "undefined" ){
                 $("#requires").html('<span class="iconfont icon-xinxi" style="font-size:0.8em;"><a href="https://github.com/nebulasio/WebExtensionWallet">使用本网页需安装钱包插件，立即前往>></a></span>');
             }
         }
