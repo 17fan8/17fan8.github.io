@@ -203,12 +203,12 @@
                         $("#share-percent").val(dinner.sharePercent);
                         $("#contact-info").val(dinner.contactInfo||"");
                         if(dinner.lock) {
-                            $("lock").attr("disabled","disabled");
-                            $("unlock").removeAttr("disabled");
+                            $("#lock").attr("disabled","disabled");
+                            $("#unlock").removeAttr("disabled");
                         }
                         else {
-                            $("unlock").attr("disabled","disabled");
-                            $("lock").removeAttr("disabled");
+                            $("#unlock").attr("disabled","disabled");
+                            $("#lock").removeAttr("disabled");
                         }
                     }
                     else {
