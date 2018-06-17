@@ -27,6 +27,7 @@
     }
     .bid-list {
         box-shadow:0 0 1.6em 0.2em gray inset;
+        margin-bottom:0;
     }
     a[disabled] {
         color:lightgrey !important;
@@ -340,7 +341,7 @@
                     }
                 }
             }
-            return {sharedNas:sharedNas,tookNas:tookNas};
+            return {sharedNas:sharedNas.dividedToIntegerBy(0.0001).times(0.0001),tookNas:tookNas.dividedToIntegerBy(0.0001).times(0.0001)};
         }
 
         function onPageTo(obj,page) {
@@ -363,12 +364,12 @@
         }
 
         function setPage(bidders, page) {
-            var html = '<table class="table table-striped" style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>No</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
+            var html = '<table class="table table-striped bid-list " style="font-size:0.6em;table-layout: fixed;"><thead><th width=40px>No</th><th>地址</th><th width=80px>出价</th></thead><tbody>';
             var from = bidders.length-1-page*10;
             var to = from-10;
             if(to<0)
-                to=0;
-            for(let i=from;i>=to;--i) {
+                to=-1;
+            for(let i=from;i>to;--i) {
                 html+='<tr>' +
                 '<td>'+ (bidders.length-i) +'</td>' +
                 '<td><div class="text-nowrap'+(bidders[i].addr===bindAddr?' alert-success':'') +'">'+ bidders[i].addr+'</div></td>' +
@@ -378,7 +379,7 @@
             html+="</tbody></table>";
             var pages = parseInt((bidders.length+9)/10);
             if(bidders.length>10) {
-                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;" page='+page+'>' +
+                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;display: inline-flex;" page='+page+'>' +
                     '<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:" '+(page==0?'disabled=disabled':'onclick="onPagePrev(this)"')+'>前一页</a></li>';
                 for(let p=0;p<pages;++p) {
                     html +='<li class="page-item'+(page==p?' active':'')+'"><a class="page-link" href="javascript:" onclick="onPageTo(this,'+p+')">'+(p+1)+'</a></li>';
@@ -578,14 +579,13 @@
                         '<a data-toggle="tooltip" data-html=true title="<p>活动结束时将根据该分成比例奖励给活动的所有参与者:<br>参与者奖励金额=最高押金*分成比例*参与者竞价次数/总竞价次数</p>">分成比例：'+ (dinner.sharePercent||0)+' % <span class="iconfont icon-xinxi"></span></a>' +
                     '</div>' +
                 '</div>' +
-                '<div id=bid-list-'+dinner.id+' class="row bid-list collapse'+(showBidList?' show':'')+'">'+
+                '<div id=bid-list-'+dinner.id+' class="row collapse'+(showBidList?' show':'')+'" style="text-align:center;">'+
                     bidList +
                 '</div>' +
                 '<hr>' +
                 '<div class="row form-group">'+
                     '<div class=col>' +
                         '<button class="btn btn-block" '+btnState+btnClick+'>'+btnText+'</button>' +
-                    '<p style="color:#6f3304">提示：本次活动分成将于6月18日12时之前发放到所有竞拍帐号！</p>' +
                     '</div>' +
                 '</div>'+(bidStateDom?bidStateDom.outerHTML:'') +
                 '</div>';

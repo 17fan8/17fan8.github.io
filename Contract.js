@@ -1,5 +1,6 @@
 'use strict';
 
+const version="1.0.2";
 const unit_nas=new BigNumber(1000000000000000000);
 
 
@@ -130,6 +131,9 @@ Dinner.prototype = {
                     }
                 });
             }
+            else {
+                throw new Error("return nas fails, transfer result:" + Json.stringify(result));            
+            }
         }
     },
     isActive:function(){
@@ -182,6 +186,10 @@ DinnerContract.prototype = {
 
     name: function () {
         return this._name;
+    },
+
+    version:function() {
+        return version;
     },
 
     //添加颁布地址，只有这些地址才能颁布奖状
@@ -262,6 +270,52 @@ DinnerContract.prototype = {
 
     info:function(hash) {
         return this.dinners.get(hash);
+    },
+
+    uploadDinner:function(str){
+        var from = Blockchain.transaction.from;
+        if(from !== this._creator) {
+            throw new Error("not creator address!");
+        }
+        var dinner = new Dinner(str);
+        if(!dinner.hash||dinner.hash==""){
+            throw new Error("hash is empty!")
+        }
+        if(!dinner.ownerAddr||dinner.ownerAddr==""){
+            throw new Error("ownerAddr is empty!")
+        }
+
+        var issuer = this.issuers.get(dinner.ownerAddr);
+        if(issuer == null) {
+            throw new Error("ownerAddr is not a issuer!");
+        }
+
+        this.dinners.set(dinner.hash,dinner);
+
+        var list = this.issuerDinnerList.get(dinner.ownerAddr)||new DinnerList();
+        list.addDinner(dinner.hash);
+        this.issuerDinnerList.set(dinner.ownerAddr,list);
+    },
+
+    //如果是单条数据，则添加到最后，如果是一个队列，则替换原有竞投数据
+    uploadBidder:function(hash,str){
+        var from = Blockchain.transaction.from;
+        if(from !== this._creator) {
+            throw new Error("not creator address!")
+        }
+        var dinner = this.dinners.get(hash);
+        if(!dinner) {
+            throw new Error("no dinner matched!");
+        }
+        var bidder = JSON.parse(str);
+        if(Object.prototype.toString.call(bidder)=='[object Array]') {
+            dinner.bidders=bidder;
+        }
+        else {
+            dinner.bidders.push(bidder);
+        }
+
+        this.dinners.set(hash,dinner);
     },
 
     //竞标
@@ -436,7 +490,7 @@ DinnerContract.prototype = {
             var bnPercent = new BigNumber(dinner.sharePercent);
             if(bnPercent.gt(0) && bnPercent.lte(100)) {
                 var sharedNas = ownerNas.times(bnPercent).div(100);
-                ownerNas = ownerNas.minus(sharedNas);
+                ownerNas = ownerNas.minus(sharedNas).dividedToIntegerBy(1);
             }
 
             if(ownerNas.gt(0)) {
@@ -450,6 +504,9 @@ DinnerContract.prototype = {
                             value: ownerNas
                         }
                     });
+                }
+                else {
+                    throw new Error("transfer result:" + Json.stringify(result));            
                 }
             }
         }
@@ -483,7 +540,7 @@ DinnerContract.prototype = {
             var sharedNas = new BigNumber(0);
             var from = Blockchain.transaction.from;
             if(bnPercent.gt(0) && bnPercent.lte(100)) {
-                var sharedUnit = ownerNas.times(bnPercent).div(100*dinner.bidders.length);
+                var sharedUnit = ownerNas.times(bnPercent).div(100*dinner.bidders.length).dividedToIntegerBy(1);
                 var bidders = dinner.bidders;
                 for(var i = 0; i<bidders.length; ++i) {
                     var bidder = bidders[i];
@@ -503,14 +560,27 @@ DinnerContract.prototype = {
                         Transfer: {
                             from: Blockchain.transaction.to,
                             to: from,
-                            value: ownerNas
+                            value: sharedNas
                         }
                     });
+                }
+                else {
+                    throw new Error("transfer result:" + Json.stringify(result));            
                 }
             }
         }
 
         return "ok";
+    },
+
+    accept:function(){
+        Event.Trigger("transfer", {
+            Transfer: {
+                from: Blockchain.transaction.from,
+                to: Blockchain.transaction.to,
+                value: Blockchain.transaction.value,
+            }
+        });
     },
 
     //管理者领取Nas, 误充Nas可以用该接口提现
@@ -531,6 +601,9 @@ DinnerContract.prototype = {
                     value: value
                 }
             });
+        }
+        else {
+            throw new Error("transfer result:" + Json.stringify(result));            
         }
         return "ok";
     }

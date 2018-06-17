@@ -24,6 +24,19 @@
                 <label data-i18n=list/contract-address>Contract Address</label>
                 <div class="contract icon-address" name="contract"></div>
             </div>
+        </div>
+        <div class="form-group row">
+            <div class=col-md-12>
+                <label for=data>
+                    <span data-i18n=register/data>Data</span>
+                </label>
+                <div class="data">
+                    <textarea id="data" class="form-control" style="height: 120px;" data-i18n="placeholder/data"></textarea>
+                    <button id="upload-dinner" class="btn input-group-btn"> 上传 </button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
             <div class=col-md-6>
                 <label for="hash" data-i18n=new-dinner/hash>Hash</label>
                 <div class=input-group>
@@ -95,7 +108,7 @@
             <div class=col-md-6>
                 <label for="contact-info" data-i18n=new-dinner/contact-info>Contact Info</label>
                 <div class=input-group>
-                    <input id="contact-info" class="form-control" data-i18n="placeholder/contact-info" value=20>
+                    <input id="contact-info" class="form-control" data-i18n="placeholder/contact-info">
                     <button id="set-contact-info" class="btn input-group-btn"> 设置 </button>
                 </div>
             </div>
@@ -106,6 +119,19 @@
             </div>
             <div class="offset-md-2 col-md-4">
                 <button id=unlock class="btn input-group-btn" data-i18n=new-dinner/unlock>Unlock</button>
+            </div>
+        </div>
+        <div class="form-group row">        
+            <div class="offset-md-8 col-md-4">
+                <button id=take-nas-by-owner class="btn input-group-btn" data-i18n=new-dinner/take-nas-by-owner>Get Dinner Nas</button>
+            </div>
+        </div>
+        <div class="form-group row">     
+            <div class="col-md-12">
+                <div class=input-group>
+                    <input id="nas-to-take" class="form-control" data-i18n="placeholder/nas-to-take">
+                    <button id=take-nas-by-creator class="btn input-group-btn" data-i18n=new-dinner/take-nas-by-creator>Get Contract Nas</button>
+                </div>
             </div>
         </div>
     </div>
@@ -180,9 +206,12 @@
 
             $("#set-hash").click(function(){
                 var hash = $("#hash").val();
+
+                contractAddr = $(".icon-address.contract input").val();
+
                 var param = 
                 {
-                    from: issuerAddr,
+                    from: contractAddr,
                     to: contractAddr,
                     value: Unit.nasToBasic(Utils.toBigNumber("0")),
                     nonce: 0,
@@ -194,6 +223,7 @@
                 .then(function(tx) {
                     let dinner = JSON.parse(tx.result);
                     if(dinner) {
+                        $("#data").val(JSON.stringify(dinner));
                         $("#title").val(dinner.title);
                         $("#text").val(dinner.text);
                         $("#begin-block").val(dinner.beginBlock);
@@ -202,13 +232,19 @@
                         $("#max-bid-step").val(dinner.maxBidStep);
                         $("#share-percent").val(dinner.sharePercent);
                         $("#contact-info").val(dinner.contactInfo||"");
-                        if(dinner.lock) {
+                        if(dinner.locked) {
                             $("#lock").attr("disabled","disabled");
                             $("#unlock").removeAttr("disabled");
                         }
                         else {
                             $("#unlock").attr("disabled","disabled");
                             $("#lock").removeAttr("disabled");
+                        }
+                        if(dinner.nasTook) {
+                            $("#take-nas-by-owner").attr("disabled","disabled");
+                        }
+                        else {
+                            $("#take-nas-by-owner").removeAttr("disabled");
                         }
                     }
                     else {
@@ -221,6 +257,11 @@
                         });
                     }
                 });
+            });
+
+            $("#upload-dinner").click(function(){
+                var data = $("#data").val();
+                onClickSetBtn(this,"uploadDinner",[data]);
             });
 
             $("#set-title").click(function(){
@@ -265,6 +306,12 @@
                 onClickSetBtn(this,"setMaxBidStep",[hash,maxBidStep]);
             });
 
+            $("#set-contact-info").click(function(){
+                var hash = $("#hash").val();
+                var contactInfo = $("#contact-info").val();
+                onClickSetBtn(this,"setContactInfo",[hash,contactInfo]);
+            });
+
             $("#lock").click(function(){
                 var hash = $("#hash").val();
                 onClickSetBtn(this,"lock",[hash,true]);
@@ -272,10 +319,21 @@
 
             $("#unlock").click(function(){
                 var hash = $("#hash").val();
-                onClickSetBtn(this,"lock",[hash,true]);
+                onClickSetBtn(this,"lock",[hash,false]);
+            });
+            $("#take-nas-by-owner").click(function(){
+                var hash = $("#hash").val();
+                onClickSetBtn(this,"takeNasByOwner",[hash]);
+            });
+
+            $("#take-nas-by-creator").click(function(){
+                var nas = $("#nas-to-take").val();
+                var nasInWei = Unit.nasToBasic(Utils.toBigNumber(nas))
+                onClickSetBtn(this,"takeNasByCreator",[nasInWei]);
             });
             
             function onClickSetBtn(btn,func,args) {
+                contractAddr = $(".icon-address.contract input").val();
                 $(btn).attr("disabled", "disabled");
                 try {
                     var serialNumber = nebPay.call(contractAddr,Unit.nasToBasic(Utils.toBigNumber(0)),func,JSON.stringify(args),{
