@@ -390,7 +390,7 @@
             html+="</tbody></table>";
             var pages = parseInt((bidders.length+9)/10);
             if(bidders.length>10) {
-                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;display: inline-flex;" page='+page+'>' +
+                html +='<ul class="pagination" style="overflow:auto;font-size:0.8em;" page='+page+'>' +
                     '<li class="page-item"><a class="page-link" style="width:6em;" href="javascript:" '+(page==0?'disabled=disabled':'onclick="onPagePrev(this)"')+'>前一页</a></li>';
                 for(let p=0;p<pages;++p) {
                     html +='<li class="page-item'+(page==p?' active':'')+'"><a class="page-link" href="javascript:" onclick="onPageTo(this,'+p+')">'+(p+1)+'</a></li>';
