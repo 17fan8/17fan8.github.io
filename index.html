@@ -416,6 +416,8 @@
             }
             return dinner;
         }
+
+        var reflashDinner=null;
         function updateDinner(result,dinner,show,showBidList=false,page=0,bidStateDom=null) {
             var progressValue =0;
             if(dinner.endBlock>dinner.beginBlock) {
@@ -476,8 +478,9 @@
                 endTime = formatTime(Date.now()+(dinner.endBlock-currentBlock)*15000)+badges;
                 na='';
 
-                var reflashDinner=setInterval(function(){
+                if(reflashDinner)
                     clearInterval(reflashDinner);
+                reflashDinner=setInterval(function(){
                     var param = 
                     {
                         from: issuerAddr,
@@ -498,7 +501,7 @@
                             let showBidList = $('#bid-list-'+dinner.id).hasClass("show");
                             let page = $('#dinner-body-'+dinner.id+'>.pagination').attr("page");
                             let bidState = $('#dinner-body-'+dinner.id+'>.bid-state');
-                            updateDinner(result,dinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
+                            updateDinner(result,newDinner,show,showBidList,page,bidState.length>0?bidState[0]:null);
                             $(".tooltip").remove();
                         //}
                     });
