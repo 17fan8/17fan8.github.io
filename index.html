@@ -806,11 +806,12 @@
                             updateDinner($("#result"),dinner,show,showBidList,page);
 
                             $('#dinner-body-'+dinner.id).append('<div class="bid-state">竞价成功！</div>');
-                            bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
+                            let bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
                             bidState.removeClass("text-info");
                             bidState.addClass("text-success");
                         }
                         else {
+                            let bidState = $('#dinner-body-'+dinner.id + ' > .bid-state');
                             bidState.html('竞价失败！（'+respObject.data.execute_error+'）');
                             bidState.removeClass("text-info");
                             bidState.addClass("text-danger");
