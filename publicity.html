@@ -1,0 +1,160 @@
+<!doctype>
+<html>
+
+<head>
+    <link href="libs/bootstrap-4.0.0-dist/css/bootstrap.css" rel="stylesheet">
+    <link href="libs/bootstrap-slider/css/bootstrap-slider.min.css" rel="stylesheet">
+    <link href="fonts/iconfont.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
+    <link href="stylesheets/ui-block.css" rel="stylesheet">
+    <link href="stylesheets/base.css" rel="stylesheet">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/touch-icon-iphone.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="images/touch-icon-ipad.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="images/touch-icon-iphone4.png" />
+
+    <link rel="stylesheet" type="text/css" href="libs/addtohomescreen/style/addtohomescreen.css">
+    <title>和大佬吃饭吧！</title>
+    <meta name=viewport content="width=device-width">
+    <meta charset="utf-8">
+    
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-121345599-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'UA-121345599-1');
+    </script>
+    
+    <style>
+     .tooltip-inner > p {
+        text-align:left;
+    }
+    .table th, .table td {
+        padding:0.5em;
+        text-align: center;
+    }
+    .bid-list {
+        box-shadow:0 0 1.6em 0.2em gray inset;
+        margin-bottom:0;
+    }
+    a[disabled] {
+        color:lightgrey !important;
+    }
+    .page-item.active .page-link {
+        z-index: 1;
+        color: #fff;
+        background-color: #e06400;
+        border-color: #e06400;
+    }
+    .page-link{
+        color: #e06400;        
+    }
+ </style>
+</head>
+<body>
+    <div class=logo-main></div>
+    <div class="title" style="text-align: center;color:#6f3304;"></div>
+    <div class="container">
+        <div class="row">
+            <div id=requires class="col-md-12">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>往期公示</h3>
+            </div>
+        </div>
+    </div>
+    <div id=result class="container" >
+        <div>
+            <div id="dinner-1" class="dinner card na" data-hash="dba6b3673180c107edc3a57e628d293503c84d640bcbc801a95ee4f14d7dc90d">
+                <div class="dinner-header card-header bg-dinner na" data-toggle="collapse" data-target="#dinner-body-1" onclick="void(0)">
+                <div>
+                    <span class="badge badge-pill badge-info na">第2期</span>
+                </div>
+                <h5>
+                    <span class="float-right iconfont"></span>
+                    <span style="margin-right:2em">约冠哥吃个饭</span>
+                </h5>
+                <div class="text-nowrap header-hash">
+                    <i style="font-size:0.8em">hash:"dba6b3673180c107edc3a57e628d293503c84d640bcbc801a95ee4f14d7dc90d"</i>
+                    <br>
+                </div>
+            </div>
+            <div id="dinner-body-1" class="card-body form-group collapse show" data-parent="#result">
+                <div style="text-align:center;border-radius: 3px;">
+                    <h4>活动照片</h4>
+                    <img style="width:80%" src="images/001/000.jpg" class="card-img-top">
+                    <img style="width:80%" src="images/001/001.jpg" class="card-img-top">
+                    <img style="width:80%" src="images/001/002.jpg" class="card-img-top">
+                    <hr>
+                    <a href="https://explorer.nebulas.io/#/tx/4cbacf4fe72578285859c3cd84cea7ca694cb58d86547b2482acde531cf03109">收益NAS转账交易记录</a>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div id="dinner-0" class="dinner card na" data-hash="dba6b3673180c107edc3a57e628d293503c84d640bcbc801a95ee4f14d7dc90d">
+                <div class="dinner-header card-header bg-dinner na" data-toggle="collapse" data-target="#dinner-body-0" onclick="void(0)">
+                <div>
+                    <span class="badge badge-pill badge-info na">第1期</span>
+                </div>
+                <h5>
+                    <span class="float-right iconfont"></span>
+                    <span style="margin-right:2em">与义吉一起午餐</span>
+                </h5>
+                <div class="text-nowrap header-hash">
+                    <i style="font-size:0.8em">hash:"dba6b3673180c107edc3a57e628d293503c84d640bcbc801a95ee4f14d7dc90d"</i>
+                    <br>
+                </div>
+            </div>
+            <div id="dinner-body-0" class="card-body form-group collapse hide" data-parent="#result">
+                <div style="text-align:center;border-radius: 3px;">
+                    <h4>活动照片</h4>
+                    <img style="width:80%" src="images/000/000.jpg" class="card-img-top">
+                    <img style="width:80%" src="images/000/001.jpg" class="card-img-top">
+                    <img style="width:80%" src="images/000/002.jpg" class="card-img-top">
+                    <img style="width:80%" src="images/000/003.jpg" class="card-img-top">
+                    <hr>
+                    <a href="https://explorer.nebulas.io/#/tx/a0678cba074703e332985aab6cd4ff797de4595396a59b8d720fc94d0596f493">收益NAS转账交易记录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class=footer></div>
+
+
+    <script src="libs/jquery-3.3.1.min.js"></script>
+    <script src="libs/bootstrap-4.0.0-dist/js/bootstrap.bundle.min.js" data-depends="jquery.slim"></script>
+    <script src="libs/bootstrap-slider/bootstrap-slider.min.js"></script>
+    <script src="libs/external/jquery.md5.js"></script>
+    <script src="libs/bootbox.min.js" data-depends="bootstrap jquery.slim"></script>
+    <script src="libs/jquery.qrcode.min.js" data-depends="jquery"></script>
+    <script src="libs/addtohomescreen/src/addtohomescreen.js"></script>
+    <script src="libs/blockies.min.js"></script>
+    <script src="dist/nebulas.js"></script>
+    <script src="libs/nebPay.js"></script>
+    <script src="js/1-localSave.js"></script>
+    <script src="js/home.v1.js"></script>
+    <script>
+        localSave.setItem("lang","zh");
+    </script>
+    <script src="js/i18n.js" data-depends="jquery.slim"></script>
+    <script src="js/ui-block.js" data-depends="bootbox blockies jquery.slim i18n.js nebulas.js"></script>
+    <script>
+        "use strict";
+        uiBlock.insert({
+            footer: ".footer",
+            title: ".title",
+            header: ".header",
+            iconAddress: ".icon-address",
+            logoMain: [".logo-main", "", false],
+            numberComma: ".number-comma",
+        });
+    </script>
+</body>
+</html>
